@@ -9,7 +9,7 @@ void MakeSet(int x, int* Par, int* Rank){
 
 int Find(int x, int* Par){
     if(Par[x]!=x)
-        Par[x]=Find(x,Par);
+        Par[x]=Find(Par[x],Par);
     return Par[x];
 }
 

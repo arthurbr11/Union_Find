@@ -20,13 +20,23 @@ int main(){
     int* RankNode=new int [N];
     int* ParTree=new int [N];
     int* RankTree=new int [N];
-    int*M=new int [N];
-    int*lowest_node=new int [N];
+    int* M=new int [N];
+    int* lowest_node=new int [N];
     Node* Nodes=new Node [N];
     for (int i=0;i<N;i++)
         V[i]=i;
     int Root=-1;
     BuildComponentTree(V,width,height,image,ParNode,RankNode,ParTree,RankTree,Nodes,Root,M,lowest_node);
+
+    delete [] V;
+    delete [] ParNode;
+    delete [] ParTree;
+    delete [] RankNode;
+    delete [] RankTree;
+    delete [] M;
+    delete [] lowest_node;
+    delete [] Nodes;
+    delete default_image_file;
 
 
 
