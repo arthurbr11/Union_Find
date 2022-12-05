@@ -106,6 +106,7 @@ void BuildComponentTree(int* V, int width, int height, byte* F, int* ParNode, in
                 lowest_node[curTree]=curNode;
             }
         }
+        Processed[V[i]]=true;
     }
     Root=lowest_node[Find(Find(0,ParNode),ParTree)];
     for(int i=0; i<N;i++){
