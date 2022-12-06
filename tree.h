@@ -13,10 +13,11 @@ class Node{
     int level;
     int area;
     int highest;
+    int vol;
     vector<Node> children;
 public:
-    Node(){level=-1; children={}; area=-1, highest=-1;}
-    Node(int l){level=l; children={}; area=1, highest=l;}
+    Node(){level=-1; children={}; area=-1, highest=-1;vol=-1;}
+    Node(int l){level=l; children={}; area=1, highest=l;vol=1;}
     ~Node(){} //A faire
     void addChildren(vector<Node> new_children){children.insert( children.end(), new_children.begin(), new_children.end());}
     void addChild(Node new_child){children.push_back(new_child);}
@@ -26,6 +27,8 @@ public:
     void setHighest(int h){highest=h;}
     int getHighest(){return highest;}
     int getLevel(){return level;}
+    int getVol(){return vol;}
+    void setVol(int v){vol=v;}
 };
 
 void MakeSet(int x, int* Par, int* Rank);
@@ -41,3 +44,4 @@ vector<int> valid_neighbors(vector<bool> Processed, int p, byte* F, int width, i
 
 void BuildComponentTree(int*V, int width, int height, byte* F, int*ParNode, int*RankNode, int*ParTree, int*RankTree, Node* Nodes,  int &Root, int*M, int*lowest_node);
 
+int computeVolume(Node n);

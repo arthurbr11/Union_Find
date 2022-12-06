@@ -113,3 +113,15 @@ void BuildComponentTree(int* V, int width, int height, byte* F, int* ParNode, in
         M[i]=Find(V[i],ParNode);
     }
 }
+
+int computeVolume(Node n){
+    int vol = n.getArea();
+    vector <Node> children = n.getChildren();
+    if(children.size()>0){
+        for(int i=0;i<children.size();i++)
+            vol += computeVolume(children[i])+children[i].getArea()*(children[i].getLevel()-n.getLevel());
+    }
+    n.setVol(vol);
+    return vol;
+
+}

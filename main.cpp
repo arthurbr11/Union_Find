@@ -28,6 +28,24 @@ int main(){
     int Root=-1;
     BuildComponentTree(V,width,height,image,ParNode,RankNode,ParTree,RankTree,Nodes,Root,M,lowest_node);
 
+    cout<<computeVolume(Nodes[Root])<<endl;
+
+    Window window = openWindow(width, height);
+    putGreyImage(IntPoint2(0,0), image, width, height);
+
+    bool keep_going=true;
+    int x,y,z;
+    while(keep_going){
+        if(anyGetMouse(x,y,window,z)==3)
+            keep_going=false;
+        Node n = Nodes[lowest_node[M[x+width*y]]]; //Root of the partial tree containing this pixel
+
+    }
+
+
+
+    endGraphics();
+
     delete [] V;
     delete [] ParNode;
     delete [] ParTree;
