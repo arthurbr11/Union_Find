@@ -6,6 +6,8 @@ const char* default_image_file=srcPath("/running-horse-rect.png");
 
 
 int main(){
+
+    true? cout<<"s",cout<<"e":cout<<"f",cout<<"j";
     string image_file = (argc>1)? argv[1]: default_image_file;
     byte* image;
     int width, height;
@@ -16,19 +18,16 @@ int main(){
     }
     int N=width*height;
     int* V=new int [N];
-    int* ParNode= new int [N];
-    int* RankNode=new int [N];
-    int* ParTree=new int [N];
-    int* RankTree=new int [N];
+    attributes* att=new attributes[N];
     int* M=new int [N];
     int* lowest_node=new int [N];
     Node* Nodes=new Node [N];
     for (int i=0;i<N;i++)
         V[i]=i;
     int Root=-1;
-    BuildComponentTree(V,width,height,image,ParNode,RankNode,ParTree,RankTree,Nodes,Root,M,lowest_node);
+    BuildComponentTree(V,width,height,image,att,Nodes,Root,M,lowest_node);
 
-    cout<<computeVolume(Nodes[Root])<<endl;
+    cout<<computeVolume(&Nodes[Root])<<endl;
 
     Window window = openWindow(width, height);
     putGreyImage(IntPoint2(0,0), image, width, height);
@@ -47,10 +46,7 @@ int main(){
     endGraphics();
 
     delete [] V;
-    delete [] ParNode;
-    delete [] ParTree;
-    delete [] RankNode;
-    delete [] RankTree;
+    delete [] att;
     delete [] M;
     delete [] lowest_node;
     delete [] Nodes;

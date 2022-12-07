@@ -1,36 +1,52 @@
 #include "tree.h"
 
-void MakeSet(int x, int* Par, int* Rank){
-    Par[x]=x;
-    Rank[x]=0;
+void MakeSet(int x,attributes* att,const bool type){
+    type? att[x].setParNode(x),att[x].setRankNode(0) : att[x].setParTree(x), att[x].setRankTree(0);
 }
 
 
 
-int Find(int x, int* Par){
-    if(Par[x]!=x)
-        Par[x]=Find(Par[x],Par);
-    return Par[x];
-}
-
-
-
-
-
-int Link(int x, int y, int* Par, int* Rank){
-    if(Rank[x]>Rank[y]){
-        int z = x;
-        x=y;
-        y=z;
+int Find(int x,attributes* att,const bool type){
+    if (type){
+        if(att[x].getParNode()!=x)
+            att[x].setParNode(Find(att[x].getParNode(),att,type));
+        return att[x].getParNode();
     }
-    if(Rank[x]==Rank[y])
-        Rank[y]++;
-    Par[x]=y;
-    return y;
+    else{
+        if(att[x].getParTree()!=x)
+            att[x].setParTree(Find(att[x].getParTree(),att,type));
+        return att[x].getParTree();
+    }
+
 }
 
-int MergeNode(int n1, int n2, int* ParNode, int* RankNode, Node* Nodes){
-    int tmpNode= Link(n1, n2, ParNode, RankNode);
+int Link(int x, int y, attributes* att,const bool type){
+    if (type){
+        if(att[x].getRankNode()>att[y].getRankNode()){
+            int z = x;
+            x=y;
+            y=z;
+        }
+        if(att[x].getRankNode()==att[y].getRankNode())
+            att[y].setRankNode(att[y].getRankNode()+1);
+        att[x].setParNode(y);
+        return y;
+    }
+    else{
+        if(att[x].getRankTree()>att[y].getRankTree()){
+            int z = x;
+            x=y;
+            y=z;
+        }
+        if(att[x].getRankTree()==att[y].getRankTree())
+            att[y].setRankTree(att[y].getRankTree()+1);
+        att[x].setParTree(y);
+        return y;
+    }
+}
+
+int MergeNode(int n1, int n2, attributes* att, Node* Nodes){
+    int tmpNode= Link(n1, n2,att,node);
     int tmpNode2=-1;
     if(tmpNode==n2){
         Nodes[n2].addChildren(Nodes[n1].getChildren());
@@ -45,7 +61,7 @@ int MergeNode(int n1, int n2, int* ParNode, int* RankNode, Node* Nodes){
     return tmpNode;
 }
 
-void sort(int* V, byte* F, int N){ //Tri par ordre décroissant
+void sort(int* V, const byte* F, const int N){ // decreasing sort
     vector<int> Levels[256];
     for(int i=0; i<N; i++){
         Levels[F[i]].push_back(i);
@@ -60,7 +76,7 @@ void sort(int* V, byte* F, int N){ //Tri par ordre décroissant
 }
 
 
-vector<int> valid_neighbors(vector<bool> Processed, int p, byte* F, int width, int height){
+vector<int> valid_neighbors(const vector<bool> &Processed,const int p, const byte* F, const int width,const int height){
     vector<int> E={};
     if(p%width!=0 and not Processed[p-1] and F[p-1]>=F[p])
         E.push_back(p-1);
@@ -77,51 +93,51 @@ vector<int> valid_neighbors(vector<bool> Processed, int p, byte* F, int width, i
 
 
 
-void BuildComponentTree(int* V, int width, int height, byte* F, int* ParNode, int* RankNode, int* ParTree, int* RankTree, Node* Nodes,  int &Root, int* M, int* lowest_node){
+void BuildComponentTree(int* V,const int width,const int height,const byte* F,attributes* att, Node* Nodes,  int &Root, int* M, int* lowest_node){
     const int N=width*height;
     sort(V,F,N);
     for(int i=0; i<N;i++){
-        MakeSet(V[i], ParTree, RankTree);
-        MakeSet(V[i], ParNode, RankNode);
+        MakeSet(V[i],att,node);
+        MakeSet(V[i], att,tree);
         Nodes[V[i]]=Node(F[V[i]]);
         lowest_node[V[i]]=V[i];
     }
     vector<bool> Processed(N, false);
     for(int i=0; i<N;i++){
-        int curTree=Find(V[i], ParTree);
-        int curNode=Find(lowest_node[curTree], ParNode);
+        int curTree=Find(V[i], att,tree);
+        int curNode=Find(lowest_node[curTree], att,node);
         vector<int> valid_neighborhood = valid_neighbors(Processed, V[i], F, width, height);
         for(int j=0;j<valid_neighborhood.size();j++){
-            int adjTree=Find(valid_neighborhood[j], ParTree);
-            int adjNode=Find(lowest_node[adjTree], ParNode);
+            int adjTree=Find(valid_neighborhood[j], att,tree);
+            int adjNode=Find(lowest_node[adjTree], att,node);
             if(curNode!=adjNode){
                 if(Nodes[curNode].getLevel()==Nodes[adjNode].getLevel())
-                    curNode=MergeNode(adjNode,curNode, ParNode, RankNode, Nodes);
+                    curNode=MergeNode(adjNode,curNode, att, Nodes);
                 else{
-                    Nodes[curNode].addChild(Nodes[adjNode]);
+                    Nodes[curNode].addChild(&Nodes[adjNode]);
                     Nodes[curNode].setArea(Nodes[curNode].getArea()+Nodes[adjNode].getArea());
                     Nodes[curNode].setHighest(max(Nodes[curNode].getHighest(),Nodes[adjNode].getHighest()));
                     }
-                curTree=Link(adjTree,curTree,ParTree,RankTree);
+                curTree=Link(adjTree,curTree,att,tree);
                 lowest_node[curTree]=curNode;
             }
         }
         Processed[V[i]]=true;
     }
-    Root=lowest_node[Find(Find(0,ParNode),ParTree)];
+    Root=lowest_node[Find(Find(0,att,node),att,tree)];
     for(int i=0; i<N;i++){
-        M[i]=Find(V[i],ParNode);
+        M[i]=Find(V[i],att,node);
     }
 }
 
-int computeVolume(Node n){
-    int vol = n.getArea();
-    vector <Node> children = n.getChildren();
+int computeVolume(Node* n){
+    int vol = n->getArea();
+    vector<Node*> children = n->getChildren();
     if(children.size()>0){
         for(int i=0;i<children.size();i++)
-            vol += computeVolume(children[i])+children[i].getArea()*(children[i].getLevel()-n.getLevel());
+            vol += computeVolume(children[i])+children[i]->getArea()*(children[i]->getLevel()-n->getLevel());
     }
-    n.setVol(vol);
+    n->setVol(vol);
     return vol;
 
 }
