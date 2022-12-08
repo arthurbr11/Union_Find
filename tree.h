@@ -19,14 +19,10 @@ class attributes{
     int RankNode;
 public:
     attributes(){ParTree=-1;ParNode=-1;RankTree=-1;RankNode=-1;}
-    void setParTree(int x){ParTree=x;}
-    int getParTree(){return ParTree;}
-    void setParNode(int x){ParNode=x;}
-    int getParNode(){return ParNode;}
-    void setRankTree(int x){RankTree=x;}
-    int getRankTree(){return RankTree;}
-    void setRankNode(int x){RankNode=x;}
-    int getRankNode(){return RankNode;}
+    void setPar(int x,bool type){type?ParNode=x:ParTree=x;}
+    int getPar(bool type){if(type)return ParNode;return ParTree;}
+    void setRank(int x,bool type){type?RankNode=x:RankTree=x;}
+    int getRank(bool type){if(type)return RankNode;return RankTree;}
 };
 
 class Node{

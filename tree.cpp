@@ -1,48 +1,27 @@
 #include "tree.h"
 
 void MakeSet(int x,attributes* att,const bool type){
-    type? att[x].setParNode(x),att[x].setRankNode(0) : att[x].setParTree(x), att[x].setRankTree(0);
+    att[x].setPar(x,type),att[x].setRank(0,type);
 }
 
-
-
 int Find(int x,attributes* att,const bool type){
-    if (type){
-        if(att[x].getParNode()!=x)
-            att[x].setParNode(Find(att[x].getParNode(),att,type));
-        return att[x].getParNode();
-    }
-    else{
-        if(att[x].getParTree()!=x)
-            att[x].setParTree(Find(att[x].getParTree(),att,type));
-        return att[x].getParTree();
-    }
+    if(att[x].getPar(type)!=x)
+        att[x].setPar(Find(att[x].getPar(type),att,type),type);
+    return att[x].getPar(type);
 
 }
 
 int Link(int x, int y, attributes* att,const bool type){
-    if (type){
-        if(att[x].getRankNode()>att[y].getRankNode()){
-            int z = x;
-            x=y;
-            y=z;
-        }
-        if(att[x].getRankNode()==att[y].getRankNode())
-            att[y].setRankNode(att[y].getRankNode()+1);
-        att[x].setParNode(y);
-        return y;
+    if(att[x].getRank(type)>att[y].getRank(type)){
+        int z = x;
+        x=y;
+        y=z;
     }
-    else{
-        if(att[x].getRankTree()>att[y].getRankTree()){
-            int z = x;
-            x=y;
-            y=z;
-        }
-        if(att[x].getRankTree()==att[y].getRankTree())
-            att[y].setRankTree(att[y].getRankTree()+1);
-        att[x].setParTree(y);
-        return y;
-    }
+    if(att[x].getRank(type)==att[y].getRank(type))
+        att[y].setRank(att[y].getRank(type)+1,type);
+    att[x].setPar(y,type);
+    return y;
+
 }
 
 int MergeNode(int n1, int n2, attributes* att, Node* Nodes){
@@ -117,7 +96,7 @@ void BuildComponentTree(int* V,const int width,const int height,const byte* F,at
                     Nodes[curNode].addChild(&Nodes[adjNode]);
                     Nodes[curNode].setArea(Nodes[curNode].getArea()+Nodes[adjNode].getArea());
                     Nodes[curNode].setHighest(max(Nodes[curNode].getHighest(),Nodes[adjNode].getHighest()));
-                    }
+                }
                 curTree=Link(adjTree,curTree,att,tree);
                 lowest_node[curTree]=curNode;
             }
