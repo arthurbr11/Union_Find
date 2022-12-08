@@ -2,7 +2,7 @@
 
 
 
-const char* default_image_file=srcPath("/running-horse-rect.png");
+const char* default_image_file=srcPath("/image_noir_et_blanc.jpg");
 
 
 int main(){
@@ -16,21 +16,32 @@ int main(){
         cerr << "Error loading image file " << image_file << endl;
         return 1;
     }
+
+//    Window window = openWindow(width, height);
+//    putGreyImage(IntPoint2(0,0), image, width, height);
+
     int N=width*height;
     int* V=new int [N];
-    attributes* att=new attributes[N];
+    Attributes* att=new Attributes[N];
     int* M=new int [N];
     int* lowest_node=new int [N];
     Node* Nodes=new Node [N];
     for (int i=0;i<N;i++)
         V[i]=i;
-    int Root=-1;
-    BuildComponentTree(V,width,height,image,att,Nodes,Root,M,lowest_node);
+    int root=-1;
+    BuildComponentTree(V,width,height,image,att,Nodes,root,M,lowest_node);
 
-    cout<<computeVolume(&Nodes[Root])<<endl;
+    cout<<computeVolume(&Nodes[root])<<endl;
+
+    for (int i=0;i<N;i++){
+        Nodes[lowest_node[M[i]]].addPixel(i);
+    }
+    byte* image_rebuilt=new byte[N];
+
+    drawTree(image_rebuilt,Nodes[root]);
 
     Window window = openWindow(width, height);
-    putGreyImage(IntPoint2(0,0), image, width, height);
+    putGreyImage(IntPoint2(0,0), image_rebuilt, width, height);
 
     bool keep_going=true;
     int x,y,z;

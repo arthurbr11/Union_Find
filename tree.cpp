@@ -1,17 +1,17 @@
 #include "tree.h"
 
-void MakeSet(int x,attributes* att,const bool type){
+void MakeSet(const int x,Attributes* att,const bool type){
     att[x].setPar(x,type),att[x].setRank(0,type);
 }
 
-int Find(int x,attributes* att,const bool type){
+int Find(const int x,Attributes* att,const bool type){
     if(att[x].getPar(type)!=x)
         att[x].setPar(Find(att[x].getPar(type),att,type),type);
     return att[x].getPar(type);
 
 }
 
-int Link(int x, int y, attributes* att,const bool type){
+int Link(int x, int y, Attributes* att,const bool type){
     if(att[x].getRank(type)>att[y].getRank(type)){
         int z = x;
         x=y;
@@ -24,7 +24,7 @@ int Link(int x, int y, attributes* att,const bool type){
 
 }
 
-int MergeNode(int n1, int n2, attributes* att, Node* Nodes){
+int MergeNode(int n1, int n2, Attributes* att, Node* Nodes){
     int tmpNode= Link(n1, n2,att,node);
     int tmpNode2=-1;
     if(tmpNode==n2){
@@ -72,7 +72,7 @@ vector<int> valid_neighbors(const vector<bool> &Processed,const int p, const byt
 
 
 
-void BuildComponentTree(int* V,const int width,const int height,const byte* F,attributes* att, Node* Nodes,  int &Root, int* M, int* lowest_node){
+void BuildComponentTree(int* V,const int width,const int height,const byte* F,Attributes* att, Node* Nodes,  int &root, int* M, int* lowest_node){
     const int N=width*height;
     sort(V,F,N);
     for(int i=0; i<N;i++){
@@ -103,7 +103,7 @@ void BuildComponentTree(int* V,const int width,const int height,const byte* F,at
         }
         Processed[V[i]]=true;
     }
-    Root=lowest_node[Find(Find(0,att,node),att,tree)];
+    root=lowest_node[Find(Find(0,att,node),att,tree)];
     for(int i=0; i<N;i++){
         M[i]=Find(V[i],att,node);
     }
@@ -119,4 +119,11 @@ int computeVolume(Node* n){
     n->setVol(vol);
     return vol;
 
+}
+
+void drawTree(byte* image,Node root){
+    for (int i=0;i<root.getChildren().size();i++)
+        drawTree(image,root);
+    for (int i=0;i<root.getPixel().size();i++)
+        image[root.getPixel()[i]]=root.getLevel();
 }
