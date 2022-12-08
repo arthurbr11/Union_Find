@@ -5,6 +5,8 @@
 #include <vector>
 #include <Imagine/Graphics.h>
 #include <cmath>
+
+
 using namespace Imagine;
 using namespace std;
 
@@ -66,3 +68,6 @@ void BuildComponentTree(int* V,const int width,const int height,const byte* F, A
 int computeVolume(Node* n);
 
 void drawTree(byte* image,Node* root);
+
+void display(Node* root,string prefix, string indent);
+

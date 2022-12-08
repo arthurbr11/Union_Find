@@ -127,3 +127,10 @@ void drawTree(byte* image,Node* root){
     for (int i=0;i<root->getPixel().size();i++)
         image[root->getPixel()[i]]=root->getLevel();
 }
+
+void display(Node* root,string prefix, string indent){
+    cout << prefix<<root->getLevel()<< endl;
+    for (int i=0;i<root->getChildren().size();i++){
+        display(root->getChildren()[i],prefix+indent,indent);
+    }
+};
