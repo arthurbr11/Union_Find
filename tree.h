@@ -36,7 +36,7 @@ public:
     Node(){level=-1; children={}; area=-1, highest=-1;vol=-1;list_pixel={};}
     Node(int l){level=l; children={}; area=1, highest=l;vol=1;list_pixel={};}
     ~Node(){int n=children.size();for (int i =0; i<n; ++i)delete children[i];}
-    void addChildren(vector<Node*> new_children){children.insert( children.end(), new_children.begin(), new_children.end());}
+    void addChildren(vector<Node*> new_children){children.insert(children.end(), new_children.begin(), new_children.end());}
     void addChild(Node* new_child){children.push_back(new_child);}
     vector<Node*> getChildren(){return children;}
     void setArea(int a){area=a;}
@@ -65,4 +65,4 @@ void BuildComponentTree(int* V,const int width,const int height,const byte* F, A
 
 int computeVolume(Node* n);
 
-void drawTree(byte* image,Node root);
+void drawTree(byte* image,Node* root);

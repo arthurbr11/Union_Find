@@ -57,13 +57,13 @@ void sort(int* V, const byte* F, const int N){ // decreasing sort
 
 vector<int> valid_neighbors(const vector<bool> &Processed,const int p, const byte* F, const int width,const int height){
     vector<int> E={};
-    if(p%width!=0 and not Processed[p-1] and F[p-1]>=F[p])
+    if(p%width!=0 and Processed[p-1] and F[p-1]>=F[p])
         E.push_back(p-1);
-    if(p%(width-1)!=0 and not Processed[p+1] and F[p+1]>=F[p])
+    if(p%(width-1)!=0 and Processed[p+1] and F[p+1]>=F[p])
         E.push_back(p+1);
-    if(p>=width and not Processed[p-width] and F[p-width]>=F[p])
+    if(p>=width and Processed[p-width] and F[p-width]>=F[p])
         E.push_back(p-width);
-    if(p<(height-1)*width and not Processed[p+width] and F[p+width]>=F[p])
+    if(p<(height-1)*width and Processed[p+width] and F[p+width]>=F[p])
         E.push_back(p+width);
     return E;
 }
@@ -81,7 +81,7 @@ void BuildComponentTree(int* V,const int width,const int height,const byte* F,At
         Nodes[V[i]]=Node(F[V[i]]);
         lowest_node[V[i]]=V[i];
     }
-    vector<bool> Processed(N, false);
+    vector<bool> Processed(N,false);
     for(int i=0; i<N;i++){
         int curTree=Find(V[i], att,tree);
         int curNode=Find(lowest_node[curTree], att,node);
@@ -105,7 +105,7 @@ void BuildComponentTree(int* V,const int width,const int height,const byte* F,At
     }
     root=lowest_node[Find(Find(0,att,node),att,tree)];
     for(int i=0; i<N;i++){
-        M[i]=Find(V[i],att,node);
+        M[V[i]]=Find(V[i],att,node);
     }
 }
 
@@ -121,9 +121,9 @@ int computeVolume(Node* n){
 
 }
 
-void drawTree(byte* image,Node root){
-    for (int i=0;i<root.getChildren().size();i++)
-        drawTree(image,root);
-    for (int i=0;i<root.getPixel().size();i++)
-        image[root.getPixel()[i]]=root.getLevel();
+void drawTree(byte* image,Node* root){
+    for (int i=0;i<root->getChildren().size();i++)
+        drawTree(image,root->getChildren()[i]);
+    for (int i=0;i<root->getPixel().size();i++)
+        image[root->getPixel()[i]]=root->getLevel();
 }

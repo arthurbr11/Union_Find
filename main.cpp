@@ -17,8 +17,9 @@ int main(){
         return 1;
     }
 
-//    Window window = openWindow(width, height);
-//    putGreyImage(IntPoint2(0,0), image, width, height);
+    Window window = openWindow(width, height);
+    putGreyImage(IntPoint2(0,0), image, width, height);
+    endGraphics();
 
     int N=width*height;
     int* V=new int [N];
@@ -31,27 +32,28 @@ int main(){
     int root=-1;
     BuildComponentTree(V,width,height,image,att,Nodes,root,M,lowest_node);
 
-    cout<<computeVolume(&Nodes[root])<<endl;
-
     for (int i=0;i<N;i++){
         Nodes[lowest_node[M[i]]].addPixel(i);
     }
     byte* image_rebuilt=new byte[N];
-
-    drawTree(image_rebuilt,Nodes[root]);
-
-    Window window = openWindow(width, height);
-    putGreyImage(IntPoint2(0,0), image_rebuilt, width, height);
-
-    bool keep_going=true;
-    int x,y,z;
-    while(keep_going){
-        if(anyGetMouse(x,y,window,z)==3)
-            keep_going=false;
-        Node n = Nodes[lowest_node[M[x+width*y]]]; //Root of the partial tree containing this pixel
-
+    Node* n1 =new Node ();
+    *n1=Nodes[root];
+    drawTree(image_rebuilt,n1);
+    int histo[256],histo_rebuilt[256];
+    for (int i=0;i<256;i++)
+        histo[i]=0,histo_rebuilt[i]=0;
+    for (int i=0;i<N;i++){
+        histo[image[i]]+=1;
+        histo_rebuilt[image_rebuilt[i]]+=1;
     }
-
+    int dif=0;
+    for (int i=0;i<256;i++){
+        if (i!=0)
+            dif+=abs(histo[i]-histo_rebuilt[i]);
+        cout << "Level "<< i<< " there is "<< histo[i]<< " pixel in image and "<< histo_rebuilt[i]<< " pixel in image rebuilt"<<endl;
+    }
+    cout << "the  absolute diff is "<< dif << " and there is "<< histo_rebuilt[0]-histo[0]<< " pixel black more";
+    putGreyImage(IntPoint2(0,0), image_rebuilt, width, height);
 
 
     endGraphics();
