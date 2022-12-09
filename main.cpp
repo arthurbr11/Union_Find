@@ -1,7 +1,7 @@
 #include "tree.h"
 
 
-const char* default_image_file=srcPath("/test.jpg");
+const char* default_image_file=srcPath("/running-horse-rect.png");
 
 
 int main(){
@@ -17,8 +17,8 @@ int main(){
     }
 
     Window window = openWindow(width, height);
-    putGreyImage(IntPoint2(0,0), image, width, height);
-    endGraphics();
+    //putGreyImage(IntPoint2(0,0), image, width, height);
+    //endGraphics();
 
 
     int N=width*height;
@@ -43,14 +43,24 @@ int main(){
     drawTree(image_rebuilt,n1);
     putGreyImage(IntPoint2(0,0), image_rebuilt, width, height);
 
-
-    IntPoint2 cord,cord2;
+    int i1,j1,i2,j2;
     int sw;
-    int button=anyGetMouse(cord,window,sw);
-    int button2=anyGetMouse(cord2,window,sw);
+    anyGetMouse(j1,i1,window,sw);
+    int button2=anyGetMouse(j2,i2,window,sw);
     while(button2==1){
+        Nodes[M[i1*width+j1]].getLevel();
+        Nodes[M[i2*width+j2]].getLevel();
 
+        for (int i=0;i<Nodes[M[i2*width+j2]].getPixel().size();i++){
+            int p=Nodes[M[i2*width+j2]].getPixel()[i];
+            drawPoint(p%width,p/width,RED);
+        }
+
+        button2=anyGetMouse(j2,i2,window,sw);
+        clearWindow();
+        putGreyImage(IntPoint2(0,0), image, width, height);
     }
+
     endGraphics();
 
     delete [] V;
