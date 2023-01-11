@@ -1,7 +1,7 @@
 #include "tree.h"
 
 
-const char* default_image_file=srcPath("/running-horse-rect.png");
+const char* default_image_file=srcPath("/test-2.jpg");
 
 
 int main(){
@@ -39,26 +39,32 @@ int main(){
     Node* n1 =new Node ();
     *n1=Nodes[root];
     string prefix="-",  indent= " ";
-    //display( n1,prefix,  indent);
+    display( n1,prefix,  indent);
     drawTree(image_rebuilt,n1);
     putGreyImage(IntPoint2(0,0), image_rebuilt, width, height);
 
-    int i1,j1,i2,j2;
+    int i1,j1;
     int sw;
-    anyGetMouse(j1,i1,window,sw);
-    int button2=anyGetMouse(j2,i2,window,sw);
-    while(button2==1){
-        Nodes[M[i1*width+j1]].getLevel();
-        Nodes[M[i2*width+j2]].getLevel();
+    int button1=anyGetMouse(j1,i1,window,sw);
+    while(button1==1){
+        vector<int> vetcor_pixel={};
+        Pixel_to_draw(vetcor_pixel,&Nodes[M[i1*width+j1]]);
 
-        for (int i=0;i<Nodes[M[i2*width+j2]].getPixel().size();i++){
-            int p=Nodes[M[i2*width+j2]].getPixel()[i];
+        for (int i=0;i<vetcor_pixel.size();i++){
+            int p=vetcor_pixel[i];
             drawPoint(p%width,p/width,RED);
         }
 
-        button2=anyGetMouse(j2,i2,window,sw);
+        for (int i=0;i<Nodes[M[i1*width+j1]].getPixel().size();i++){
+            int p=Nodes[M[i1*width+j1]].getPixel()[i];
+            drawPoint(p%width,p/width,GREEN);
+        }
+        click();
+
         clearWindow();
         putGreyImage(IntPoint2(0,0), image, width, height);
+
+        button1=anyGetMouse(j1,i1,window,sw);
     }
 
     endGraphics();

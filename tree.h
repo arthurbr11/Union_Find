@@ -71,3 +71,4 @@ void drawTree(byte* image,Node* root);
 
 void display(Node* root,string prefix, string indent);
 
+void Pixel_to_draw(vector<int> &vector_pixel,Node* n);

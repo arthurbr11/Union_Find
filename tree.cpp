@@ -59,7 +59,7 @@ vector<int> valid_neighbors(const vector<bool> &Processed,const int p, const byt
     vector<int> E={};
     if(p%width!=0 and Processed[p-1] and F[p-1]>=F[p])
         E.push_back(p-1);
-    if(p%(width-1)!=0 and Processed[p+1] and F[p+1]>=F[p])
+    if(p%width!=width-1 and Processed[p+1] and F[p+1]>=F[p])
         E.push_back(p+1);
     if(p>=width and Processed[p-width] and F[p-width]>=F[p])
         E.push_back(p-width);
@@ -83,6 +83,7 @@ void BuildComponentTree(int* V,const int width,const int height,const byte* F,At
     }
     vector<bool> Processed(N,false);
     for(int i=0; i<N;i++){
+
         int curTree=Find(V[i], att,tree);
         int curNode=Find(lowest_node[curTree], att,node);
         vector<int> valid_neighborhood = valid_neighbors(Processed, V[i], F, width, height);
@@ -134,3 +135,16 @@ void display(Node* root,string prefix, string indent){
         display(root->getChildren()[i],prefix+indent,indent);
     }
 };
+void Pixel_to_draw(vector<int> &vector_pixel,Node* n){
+    for (int i=0;i<n->getPixel().size();i++){
+        vector_pixel.push_back(n->getPixel()[i]);
+    }
+    if (n->getChildren().size()==0)
+        return ;
+    for (int i=0;i<n->getChildren().size();i++){
+        Pixel_to_draw(vector_pixel,n->getChildren()[i]);
+    }
+    return ;
+
+
+}
