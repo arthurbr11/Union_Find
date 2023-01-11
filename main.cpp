@@ -3,6 +3,21 @@
 
 const char* default_image_file=srcPath("/test-2.jpg");
 
+void draw_with_parent(Node* n,int width, int height){
+    vector<int> vetcor_pixel={};
+    Pixel_under_n(vetcor_pixel,n);
+
+    for (int i=0;i<vetcor_pixel.size();i++){
+        int p=vetcor_pixel[i];
+        drawPoint(p%width,p/width,RED);
+    }
+
+    for (int i=0;i<n->getPixel().size();i++){
+        int p=n->getPixel()[i];
+        drawPoint(p%width,p/width,GREEN);
+    }
+}
+
 
 int main(){
 
@@ -47,20 +62,9 @@ int main(){
     int sw;
     int button1=anyGetMouse(j1,i1,window,sw);
     while(button1==1){
-        vector<int> vetcor_pixel={};
-        Pixel_to_draw(vetcor_pixel,&Nodes[M[i1*width+j1]]);
+        draw_with_parent(&Nodes[M[i1*width+j1]],width,height);
 
-        for (int i=0;i<vetcor_pixel.size();i++){
-            int p=vetcor_pixel[i];
-            drawPoint(p%width,p/width,RED);
-        }
-
-        for (int i=0;i<Nodes[M[i1*width+j1]].getPixel().size();i++){
-            int p=Nodes[M[i1*width+j1]].getPixel()[i];
-            drawPoint(p%width,p/width,GREEN);
-        }
         click();
-
         clearWindow();
         putGreyImage(IntPoint2(0,0), image, width, height);
 

@@ -135,16 +135,14 @@ void display(Node* root,string prefix, string indent){
         display(root->getChildren()[i],prefix+indent,indent);
     }
 };
-void Pixel_to_draw(vector<int> &vector_pixel,Node* n){
+void Pixel_under_n(vector<int> &vector_pixel,Node* n){
     for (int i=0;i<n->getPixel().size();i++){
         vector_pixel.push_back(n->getPixel()[i]);
     }
     if (n->getChildren().size()==0)
         return ;
     for (int i=0;i<n->getChildren().size();i++){
-        Pixel_to_draw(vector_pixel,n->getChildren()[i]);
+        Pixel_under_n(vector_pixel,n->getChildren()[i]);
     }
     return ;
-
-
 }
