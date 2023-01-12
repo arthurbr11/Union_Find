@@ -72,7 +72,7 @@ vector<int> valid_neighbors(const vector<bool> &Processed,const int p, const byt
 
 
 
-void BuildComponentTree(int* V,const int width,const int height,const byte* F,Attributes* att, Node* Nodes,  int &root, int* M, int* lowest_node){
+void BuildComponentTree(int* V,const int width,const int height,const byte* F,Attributes* att, Node* Nodes,Node* nodeRoot,  int &root, int* M, int* lowest_node){
     const int N=width*height;
     sort(V,F,N);
     for(int i=0; i<N;i++){
@@ -108,14 +108,19 @@ void BuildComponentTree(int* V,const int width,const int height,const byte* F,At
     for(int i=0; i<N;i++){
         M[V[i]]=Find(V[i],att,node);
     }
+    for (int i=0;i<N;i++){
+        Nodes[M[i]].addPixel(i);
+    }
+    *nodeRoot=Nodes[root];
+    make_parent(nodeRoot,nodeRoot);
+    computeVolume(nodeRoot);
 }
 
 int computeVolume(Node* n){
     int vol = n->getArea();
-    vector<Node*> children = n->getChildren();
-    if(children.size()>0){
-        for(int i=0;i<children.size();i++)
-            vol += computeVolume(children[i])+children[i]->getArea()*(children[i]->getLevel()-n->getLevel());
+    if(n->getNbChildren()>0){
+        for(int i=0;i<n->getNbChildren();i++)
+            vol += computeVolume(n->getChildren()[i])+n->getChildren()[i]->getArea()*(n->getChildren()[i]->getLevel()-n->getLevel());
     }
     n->setVol(vol);
     return vol;
@@ -123,37 +128,31 @@ int computeVolume(Node* n){
 }
 
 void drawTree(byte* image,Node* nodeRoot){
-    for (int i=0;i<nodeRoot->getChildren().size();i++)
+    for (int i=0;i<nodeRoot->getNbChildren();i++)
         drawTree(image,nodeRoot->getChildren()[i]);
     for (int i=0;i<nodeRoot->getPixel().size();i++)
         image[nodeRoot->getPixel()[i]]=nodeRoot->getLevel();
 }
 void make_parent(Node* nodeRoot,Node* parent){
     nodeRoot->setParent(parent);
-    for (int i=0;i<nodeRoot->getChildren().size();i++)
+    for (int i=0;i<nodeRoot->getNbChildren();i++)
         make_parent(nodeRoot->getChildren()[i],nodeRoot);
 };
 
 
 void display(Node* nodeRoot,string prefix, string indent){
     cout << prefix<<nodeRoot->getLevel()<< endl;
-    for (int i=0;i<nodeRoot->getChildren().size();i++){
+    for (int i=0;i<nodeRoot->getNbChildren();i++){
         display(nodeRoot->getChildren()[i],prefix+indent,indent);
-    }
-};
-void display_parent(Node* nodeRoot,string prefix, string indent){
-    cout <<prefix<<nodeRoot->getLevel() <<" ("<<nodeRoot->getParent()->getLevel()<<")"<< endl;
-    for (int i=0;i<nodeRoot->getChildren().size();i++){
-        display_parent(nodeRoot->getChildren()[i],prefix+indent,indent);
     }
 };
 void Pixel_under_n(vector<int> &vector_pixel,Node* n){
     for (int i=0;i<n->getPixel().size();i++){
         vector_pixel.push_back(n->getPixel()[i]);
     }
-    if (n->getChildren().size()==0)
+    if (n->getNbChildren()==0)
         return ;
-    for (int i=0;i<n->getChildren().size();i++){
+    for (int i=0;i<n->getNbChildren();i++){
         Pixel_under_n(vector_pixel,n->getChildren()[i]);
     }
     return ;
@@ -174,6 +173,11 @@ void draw_with_parent(Node* n,int width, int height){
     }
 }
 
+void inverseTree(Node* nodeRoot){
+    nodeRoot->setLevel(255-nodeRoot->getLevel());
+    for(int i=0;i<nodeRoot->getNbChildren();i++)
+        inverseTree(nodeRoot->getChildren()[i]);
+}
 void sortVectorPixelRef(const int width,const int height ,const int caracteristic,const int* M,Node* Nodes,vector<int>& ListPixelReference){
     for (int i=0;i<width*height;i++){
         if (!count(ListPixelReference.begin(),ListPixelReference.end(),M[i]))
@@ -189,16 +193,16 @@ void sortVectorPixelRef(const int width,const int height ,const int caracteristi
 }
 
 int numberLeaf(Node* nodeRoot){
-    if (nodeRoot->getChildren().size()==0){
+    if (nodeRoot->getNbChildren()==0){
         return 1;}
     int L=0;
-    for (int i=0;i<nodeRoot->getChildren().size();i++){
+    for (int i=0;i<nodeRoot->getNbChildren();i++){
         L+=numberLeaf(nodeRoot->getChildren()[i]);
     }
     return L;
 }
 int firstLeaf(vector<int>& ListPixelWhichStay,Node* Nodes){
-    while(Nodes[ListPixelWhichStay.front()].getChildren().size()!=0)
+    while(Nodes[ListPixelWhichStay.front()].getNbChildren()!=0)
         ListPixelWhichStay.erase(ListPixelWhichStay.begin());
     int l=ListPixelWhichStay.front();
     ListPixelWhichStay.erase(ListPixelWhichStay.begin());
@@ -211,7 +215,7 @@ int toPixelRef(Node* n, Node* Nodes,vector<int> ListPixelReference){
     }
     return -1;
 }
-byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* Nodes,Node* nodeRoot,const int caracteristic,  const int N){
+byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* Nodes,Node* nodeRoot,int root,const int caracteristic,  const int N){
     vector<int> ListPixelReference={};
     sortVectorPixelRef(width,height,caracteristic,M,Nodes,ListPixelReference);
     vector<int> Q;
@@ -222,11 +226,12 @@ byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* N
         int c=firstLeaf(ListPixelWhichStay,Nodes);
         int p=toPixelRef(Nodes[c].getParent(),Nodes,ListPixelReference);
         Nodes[p].setNbChildren(Nodes[p].getNbChildren()-1);
-        if (Nodes[p].getChildren().size()>0)
+        if (Nodes[p].getNbChildren()>0)
            L--;
         Nodes[c].setMark(1);
         Q.push_back(c);
     }
+    Nodes[root].setMark(1);
     while (Q.size()!=0){
         int c=Q.front();
         Q.erase(Q.begin());
@@ -240,6 +245,8 @@ byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* N
 }
 int RemoveLobe(int c,Node* Nodes,vector<int>ListPixelReference){
     Node p=Nodes[c];
+    if (*Nodes[c].getParent()==Nodes[c])
+        return c;
     if (Nodes[c].getMark()==1)
         Nodes[c]=Nodes[RemoveLobe(toPixelRef(Nodes[c].getParent(),Nodes,ListPixelReference),Nodes,ListPixelReference)];
     return c;
