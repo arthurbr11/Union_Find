@@ -90,7 +90,10 @@ void display(Node* nodeRoot,string prefix, string indent);
 
 
 void Pixel_under_n(vector<int> &vector_pixel,Node* n);
+void draw(Node* n,int width, int height);
 void draw_with_parent(Node* n,int width, int height);
+
+
 
 void inverseTree(Node* nodeRoot);
 void sortVectorPixelRef(const int width,const int height ,const int caracteristic,const int* M,Node* Nodes,vector<int>& ListPixelReference);
@@ -100,3 +103,8 @@ int toPixelRef(Node n, Node* Nodes,vector<int> ListPixelReference);
 
 byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* Nodes,Node* nodeRoot,int root,const int caracteristic, const int N);
 int RemoveLobe(int c,Node* Nodes,vector<int>ListPixelReference);
+
+
+bool is_under(Node* n1,Node* n2); // n2 is under n1
+
+Node* get_parent_commun(Node* n1,Node* n2,Node* nodeRoot);

@@ -157,8 +157,7 @@ void Pixel_under_n(vector<int> &vector_pixel,Node* n){
     }
     return ;
 }
-
-void draw_with_parent(Node* n,int width, int height){
+void draw(Node* n,int width, int height){
     vector<int> vetcor_pixel={};
     Pixel_under_n(vetcor_pixel,n);
 
@@ -166,7 +165,9 @@ void draw_with_parent(Node* n,int width, int height){
         int p=vetcor_pixel[i];
         drawPoint(p%width,p/width,RED);
     }
-
+}
+void draw_with_parent(Node* n,int width, int height){
+    draw(n,width,height);
     for (int i=0;i<n->getPixel().size();i++){
         int p=n->getPixel()[i];
         drawPoint(p%width,p/width,GREEN);
@@ -227,7 +228,7 @@ byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* N
         int p=toPixelRef(Nodes[c].getParent(),Nodes,ListPixelReference);
         Nodes[p].setNbChildren(Nodes[p].getNbChildren()-1);
         if (Nodes[p].getNbChildren()>0)
-           L--;
+            L--;
         Nodes[c].setMark(1);
         Q.push_back(c);
     }
@@ -252,3 +253,31 @@ int RemoveLobe(int c,Node* Nodes,vector<int>ListPixelReference){
     return c;
 }
 
+
+bool is_under(Node* n1,Node* n2){
+    if (n2==n1){
+        return true;}
+    for (int i=0;i<n1->getNbChildren();i++)
+        if (is_under(n1->getChildren()[i],n2))
+            return true;
+    return false;
+
+}
+
+Node* get_parent_commun(Node* n1,Node* n2,Node* nodeRoot){
+    if (is_under(n1,n2))
+        return n1;
+    if (is_under(n2,n1))
+        return n2;
+    vector<Node*> List_n1={n1};
+    vector<Node*> List_n2={n2};
+    while(List_n1[List_n1.size()-1]!=nodeRoot)
+        List_n1.push_back(List_n1[List_n1.size()-1]->getParent());
+    while(List_n2[List_n2.size()-1]!=nodeRoot)
+        List_n2.push_back(List_n2[List_n2.size()-1]->getParent());
+    int lenght=min(List_n1.size(),List_n2.size());
+    for (int i=1;i<=lenght;i++)
+        if (List_n1[lenght-i]!=List_n2[lenght-i])
+            return List_n1[List_n1.size()-i+1];
+
+};

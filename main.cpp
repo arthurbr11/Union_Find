@@ -56,32 +56,57 @@ int main(){
 
     BuildComponentTree(V_incr,width,height,image_incr,att_incr,Nodes_incr,nodeRoot_incr,root_incr,M_incr,lowest_node_incr);
     inverseTree(nodeRoot_incr);
+    /**********DISPLAY THE TREES *********************/
 
     string prefix="-",  indent= " ";
+    cout<<" increasing"<<endl;
     display( nodeRoot_incr,prefix,  indent);
+    cout<<" decreasing"<<endl;
     display( nodeRoot_decr,prefix,  indent);
 
-//    byte* imageReconstruct=Keep_N_Lobes(V,width,height,M,Nodes,nodeRoot,root,AREA,2);
-//    clearWindow();
-//    putGreyImage(IntPoint2(0,0), imageReconstruct, width, height);
+    //    byte* imageReconstruct=Keep_N_Lobes(V,width,height,M,Nodes,nodeRoot,root,AREA,2);
+    //    clearWindow();
+    //    putGreyImage(IntPoint2(0,0), imageReconstruct, width, height);
 
-//    click();
-//    clearWindow();
-//    putGreyImage(IntPoint2(0,0), image, width, height);
-    int i1,j1;
-    int sw;
-    int button1=anyGetMouse(j1,i1,window,sw);
+    //    click();
+    //    clearWindow();
+    //    putGreyImage(IntPoint2(0,0), image, width, height);
+
+    /**********DISPLAY UNDER WITH PARENTS IN GREEN (RIGHT CLICK DECREASING & LEFT CLICK INCREASING)  *********************/
+    //    int i1,j1;
+    //    int button1=getMouse(j1,i1);
+    //    while(true){
+    //        if (button1==1)
+    //            draw_with_parent(&Nodes_decr[M_decr[i1*width+j1]],width,height);
+
+    //        else
+    //            draw_with_parent(&Nodes_incr[M_incr[i1*width+j1]],width,height);
+    //        click();
+    //        clearWindow();
+    //        putGreyImage(IntPoint2(0,0), image, width, height);
+
+    //        button1=getMouse(j1,i1);
+    //    }
+    /**********DISPLAY BETWEEN TWO POINT (RIGHT CLICK DECREASING & LEFT CLICK INCREASING)  *********************/
+    int i1,j1,i2,j2;
+    int button1=getMouse(j1,i1);
+    int button2=getMouse(j2,i2);
     while(true){
         if (button1==1)
-            draw_with_parent(&Nodes_decr[M_decr[i1*width+j1]],width,height);
+            draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]],nodeRoot_decr),width,height);
+
         else
-            draw_with_parent(&Nodes_incr[M_incr[i1*width+j1]],width,height);
+            draw(get_parent_commun(&Nodes_incr[M_decr[i1*width+j1]],&Nodes_incr[M_decr[i2*width+j2]],nodeRoot_incr),width,height);
+
         click();
         clearWindow();
         putGreyImage(IntPoint2(0,0), image, width, height);
 
-        button1=anyGetMouse(j1,i1,window,sw);
+        button1=getMouse(j1,i1);
+        button2=getMouse(j2,i2);
+
     }
+
     endGraphics();
 
     delete [] V_incr;
