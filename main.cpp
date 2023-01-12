@@ -3,20 +3,7 @@
 
 const char* default_image_file=srcPath("/test-2.jpg");
 
-void draw_with_parent(Node* n,int width, int height){
-    vector<int> vetcor_pixel={};
-    Pixel_under_n(vetcor_pixel,n);
 
-    for (int i=0;i<vetcor_pixel.size();i++){
-        int p=vetcor_pixel[i];
-        drawPoint(p%width,p/width,RED);
-    }
-
-    for (int i=0;i<n->getPixel().size();i++){
-        int p=n->getPixel()[i];
-        drawPoint(p%width,p/width,GREEN);
-    }
-}
 
 
 int main(){
@@ -51,12 +38,27 @@ int main(){
         Nodes[M[i]].addPixel(i);
     }
     byte* image_rebuilt=new byte[N];
-    Node* n1 =new Node ();
-    *n1=Nodes[root];
+    Node* nodeRoot =new Node ();
+    *nodeRoot=Nodes[root];
     string prefix="-",  indent= " ";
-    display( n1,prefix,  indent);
-    drawTree(image_rebuilt,n1);
+    Node* n=new Node (-1);
+    make_parent(nodeRoot,n);
+    display( nodeRoot,prefix,  indent);
+    display_parent(nodeRoot,prefix,  indent);
+
+    cout <<numberLeaf(nodeRoot)<<endl;
+
+    drawTree(image_rebuilt,nodeRoot);
     putGreyImage(IntPoint2(0,0), image_rebuilt, width, height);
+    click();
+
+    byte* imageReconstruct=Keep_N_Lobes(V,width,height,M,Nodes,nodeRoot,AREA,2);
+    clearWindow();
+    putGreyImage(IntPoint2(0,0), imageReconstruct, width, height);
+
+    click();
+    clearWindow();
+    putGreyImage(IntPoint2(0,0), image, width, height);
 
     int i1,j1;
     int sw;

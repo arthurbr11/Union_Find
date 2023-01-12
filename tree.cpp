@@ -36,7 +36,7 @@ int MergeNode(int n1, int n2, Attributes* att, Node* Nodes){
         tmpNode2=n2;
     }
     Nodes[tmpNode].setArea(Nodes[tmpNode].getArea()+Nodes[tmpNode2].getArea());
-    Nodes[tmpNode].setHighest(Nodes[tmpNode].getHighest()+Nodes[tmpNode2].getHighest());
+    Nodes[tmpNode].setHighest(max(Nodes[tmpNode].getHighest(),Nodes[tmpNode2].getHighest()));
     return tmpNode;
 }
 
@@ -122,17 +122,29 @@ int computeVolume(Node* n){
 
 }
 
-void drawTree(byte* image,Node* root){
-    for (int i=0;i<root->getChildren().size();i++)
-        drawTree(image,root->getChildren()[i]);
-    for (int i=0;i<root->getPixel().size();i++)
-        image[root->getPixel()[i]]=root->getLevel();
+void drawTree(byte* image,Node* nodeRoot){
+    for (int i=0;i<nodeRoot->getChildren().size();i++)
+        drawTree(image,nodeRoot->getChildren()[i]);
+    for (int i=0;i<nodeRoot->getPixel().size();i++)
+        image[nodeRoot->getPixel()[i]]=nodeRoot->getLevel();
 }
+void make_parent(Node* nodeRoot,Node* parent){
+    nodeRoot->setParent(parent);
+    for (int i=0;i<nodeRoot->getChildren().size();i++)
+        make_parent(nodeRoot->getChildren()[i],nodeRoot);
+};
 
-void display(Node* root,string prefix, string indent){
-    cout << prefix<<root->getLevel()<< endl;
-    for (int i=0;i<root->getChildren().size();i++){
-        display(root->getChildren()[i],prefix+indent,indent);
+
+void display(Node* nodeRoot,string prefix, string indent){
+    cout << prefix<<nodeRoot->getLevel()<< endl;
+    for (int i=0;i<nodeRoot->getChildren().size();i++){
+        display(nodeRoot->getChildren()[i],prefix+indent,indent);
+    }
+};
+void display_parent(Node* nodeRoot,string prefix, string indent){
+    cout <<prefix<<nodeRoot->getLevel() <<" ("<<nodeRoot->getParent()->getLevel()<<")"<< endl;
+    for (int i=0;i<nodeRoot->getChildren().size();i++){
+        display_parent(nodeRoot->getChildren()[i],prefix+indent,indent);
     }
 };
 void Pixel_under_n(vector<int> &vector_pixel,Node* n){
@@ -146,3 +158,90 @@ void Pixel_under_n(vector<int> &vector_pixel,Node* n){
     }
     return ;
 }
+
+void draw_with_parent(Node* n,int width, int height){
+    vector<int> vetcor_pixel={};
+    Pixel_under_n(vetcor_pixel,n);
+
+    for (int i=0;i<vetcor_pixel.size();i++){
+        int p=vetcor_pixel[i];
+        drawPoint(p%width,p/width,RED);
+    }
+
+    for (int i=0;i<n->getPixel().size();i++){
+        int p=n->getPixel()[i];
+        drawPoint(p%width,p/width,GREEN);
+    }
+}
+
+void sortVectorPixelRef(const int width,const int height ,const int caracteristic,const int* M,Node* Nodes,vector<int>& ListPixelReference){
+    for (int i=0;i<width*height;i++){
+        if (!count(ListPixelReference.begin(),ListPixelReference.end(),M[i]))
+            ListPixelReference.push_back(M[i]);
+    }
+    if (caracteristic==0)
+        sort(ListPixelReference.begin(),ListPixelReference.end(),[&Nodes](const auto& a,const auto& b){ return Nodes[a].getArea()< Nodes[b].getArea(); });
+    else if (caracteristic==1)
+        sort(ListPixelReference.begin(),ListPixelReference.end(),[&Nodes](const auto& a,const auto& b){ return Nodes[a].getHighest()< Nodes[b].getHighest(); });
+    else
+        sort(ListPixelReference.begin(),ListPixelReference.end(),[&Nodes](const auto& a,const auto& b){ return Nodes[a].getVol()< Nodes[b].getVol(); });
+
+}
+
+int numberLeaf(Node* nodeRoot){
+    if (nodeRoot->getChildren().size()==0){
+        return 1;}
+    int L=0;
+    for (int i=0;i<nodeRoot->getChildren().size();i++){
+        L+=numberLeaf(nodeRoot->getChildren()[i]);
+    }
+    return L;
+}
+int firstLeaf(vector<int>& ListPixelWhichStay,Node* Nodes){
+    while(Nodes[ListPixelWhichStay.front()].getChildren().size()!=0)
+        ListPixelWhichStay.erase(ListPixelWhichStay.begin());
+    int l=ListPixelWhichStay.front();
+    ListPixelWhichStay.erase(ListPixelWhichStay.begin());
+    return l;
+}
+int toPixelRef(Node* n, Node* Nodes,vector<int> ListPixelReference){
+    for (int i=0;i<ListPixelReference.size();i++){
+        if (Nodes[ListPixelReference[i]]==*n)
+            return ListPixelReference[i];
+    }
+    return -1;
+}
+byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* Nodes,Node* nodeRoot,const int caracteristic,  const int N){
+    vector<int> ListPixelReference={};
+    sortVectorPixelRef(width,height,caracteristic,M,Nodes,ListPixelReference);
+    vector<int> Q;
+    int L=numberLeaf(nodeRoot);
+    vector<int> ListPixelWhichStay(ListPixelReference.size());
+    copy(ListPixelReference.begin(),ListPixelReference.end(),ListPixelWhichStay.begin());
+    while(L>N){
+        int c=firstLeaf(ListPixelWhichStay,Nodes);
+        int p=toPixelRef(Nodes[c].getParent(),Nodes,ListPixelReference);
+        Nodes[p].setNbChildren(Nodes[p].getNbChildren()-1);
+        if (Nodes[p].getChildren().size()>0)
+           L--;
+        Nodes[c].setMark(1);
+        Q.push_back(c);
+    }
+    while (Q.size()!=0){
+        int c=Q.front();
+        Q.erase(Q.begin());
+        RemoveLobe(c,Nodes,ListPixelReference);
+    }
+    byte* imageReconstruct=new byte[width*height];
+    for(int i=0;i<width*height;i++){
+        imageReconstruct[V[i]]=Nodes[M[V[i]]].getLevel();
+    }
+    return imageReconstruct;
+}
+int RemoveLobe(int c,Node* Nodes,vector<int>ListPixelReference){
+    Node p=Nodes[c];
+    if (Nodes[c].getMark()==1)
+        Nodes[c]=Nodes[RemoveLobe(toPixelRef(Nodes[c].getParent(),Nodes,ListPixelReference),Nodes,ListPixelReference)];
+    return c;
+}
+
