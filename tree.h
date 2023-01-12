@@ -56,6 +56,7 @@ public:
     int getArea(){return area;}
     void setHighest(int h){highest=h;}
     int getHighest(){return highest;}
+    void setLevel(int l){level=l;}
     int getLevel(){return level;}
     int getVol(){return vol;}
     void setVol(int v){vol=v;}
@@ -78,7 +79,7 @@ void sort(int* V, const byte* F, const int N);
 vector<int> valid_neighbors(const vector<bool> &Processed,const int p, const byte* F, const int width,const int height);
 
 
-void BuildComponentTree(int* V,const int width,const int height,const byte* F, Attributes* att, Node* Nodes,  int &root, int* M, int* lowest_node);
+void BuildComponentTree(int* V,const int width,const int height,const byte* F, Attributes* att, Node* Nodes,Node* nodeRoot, int &root, int* M, int* lowest_node);
 
 int computeVolume(Node* n);
 
@@ -86,16 +87,16 @@ void drawTree(byte* image,Node* nodeRoot);
 void make_parent(Node* nodeRoot,Node* parent);
 
 void display(Node* nodeRoot,string prefix, string indent);
-void display_parent(Node* nodeRoot,string prefix, string indent);
 
 
 void Pixel_under_n(vector<int> &vector_pixel,Node* n);
 void draw_with_parent(Node* n,int width, int height);
 
+void inverseTree(Node* nodeRoot);
 void sortVectorPixelRef(const int width,const int height ,const int caracteristic,const int* M,Node* Nodes,vector<int>& ListPixelReference);
-int numberLeaf(Node* nodeRoot);
+int numberLeaf(Node* Nodes);
 int firstLeaf(vector<int>& ListPixelWhichStay,Node* Nodes);
 int toPixelRef(Node n, Node* Nodes,vector<int> ListPixelReference);
 
-byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* Nodes,Node* nodeRoot,const int caracteristic, const int N);
+byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* Nodes,Node* nodeRoot,int root,const int caracteristic, const int N);
 int RemoveLobe(int c,Node* Nodes,vector<int>ListPixelReference);
