@@ -277,7 +277,7 @@ Node* get_parent_commun(Node* n1,Node* n2,Node* nodeRoot){
         List_n2.push_back(List_n2[List_n2.size()-1]->getParent());
     int lenght=min(List_n1.size(),List_n2.size());
     for (int i=1;i<=lenght;i++)
-        if (List_n1[lenght-i]!=List_n2[lenght-i])
+        if (List_n1[List_n1.size()-i]!=List_n2[List_n2.size()-i])
             return List_n1[List_n1.size()-i+1];
 
 };
