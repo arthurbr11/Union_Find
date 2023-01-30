@@ -254,30 +254,13 @@ int RemoveLobe(int c,Node* Nodes,vector<int>ListPixelReference){
 }
 
 
-bool is_under(Node* n1,Node* n2){
-    if (n2==n1){
-        return true;}
-    for (int i=0;i<n1->getNbChildren();i++)
-        if (is_under(n1->getChildren()[i],n2))
-            return true;
-    return false;
-
-}
-
-Node* get_parent_commun(Node* n1,Node* n2,Node* nodeRoot){
-    if (is_under(n1,n2))
+Node* get_parent_commun(Node* n1,Node* n2){
+    if (n1==n2)
         return n1;
-    if (is_under(n2,n1))
-        return n2;
-    vector<Node*> List_n1={n1};
-    vector<Node*> List_n2={n2};
-    while(List_n1[List_n1.size()-1]!=nodeRoot)
-        List_n1.push_back(List_n1[List_n1.size()-1]->getParent());
-    while(List_n2[List_n2.size()-1]!=nodeRoot)
-        List_n2.push_back(List_n2[List_n2.size()-1]->getParent());
-    int lenght=min(List_n1.size(),List_n2.size());
-    for (int i=1;i<=lenght;i++)
-        if (List_n1[List_n1.size()-i]!=List_n2[List_n2.size()-i])
-            return List_n1[List_n1.size()-i+1];
-
+    if (n1->getArea()==n2->getArea())
+        get_parent_commun(n1->getParent(),n2);
+    if (n1->getArea()<n2->getArea())
+        get_parent_commun(n1->getParent(),n2);
+    else
+        get_parent_commun(n1,n2->getParent());
 };

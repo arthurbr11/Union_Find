@@ -105,6 +105,5 @@ byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* N
 int RemoveLobe(int c,Node* Nodes,vector<int>ListPixelReference);
 
 
-bool is_under(Node* n1,Node* n2); // n2 is under n1
 
-Node* get_parent_commun(Node* n1,Node* n2,Node* nodeRoot);
+Node* get_parent_commun(Node* n1,Node* n2);
