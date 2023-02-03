@@ -111,8 +111,8 @@ void BuildComponentTree(int* V,const int width,const int height,const byte* F,At
     for (int i=0;i<N;i++){
         Nodes[M[i]].addPixel(i);
     }
+    make_parent(&Nodes[root],&Nodes[root]);
     *nodeRoot=Nodes[root];
-    make_parent(nodeRoot,nodeRoot);
     computeVolume(nodeRoot);
 }
 
@@ -157,17 +157,20 @@ void Pixel_under_n(vector<int> &vector_pixel,Node* n){
     }
     return ;
 }
-void draw(Node* n,int width, int height){
+void draw(Node* n,const byte* F,int width, int height){
     vector<int> vetcor_pixel={};
     Pixel_under_n(vetcor_pixel,n);
-
+    noRefreshBegin();
+    clearWindow();
+    putGreyImage(IntPoint2(0,0), F, width, height);
     for (int i=0;i<vetcor_pixel.size();i++){
         int p=vetcor_pixel[i];
         drawPoint(p%width,p/width,RED);
     }
+    noRefreshEnd();
 }
-void draw_with_parent(Node* n,int width, int height){
-    draw(n,width,height);
+void draw_with_parent(Node* n,const byte* F,int width, int height){
+    draw(n,F,width,height);
     for (int i=0;i<n->getPixel().size();i++){
         int p=n->getPixel()[i];
         drawPoint(p%width,p/width,GREEN);

@@ -90,8 +90,8 @@ void display(Node* nodeRoot,string prefix, string indent);
 
 
 void Pixel_under_n(vector<int> &vector_pixel,Node* n);
-void draw(Node* n,int width, int height);
-void draw_with_parent(Node* n,int width, int height);
+void draw(Node* n,const byte* F,int width, int height);
+void draw_with_parent(Node* n,const byte* F,int width, int height);
 
 
 

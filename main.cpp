@@ -88,46 +88,52 @@ int main(){
     //    }
     /**********DISPLAY BETWEEN TWO POINT (RIGHT CLICK DECREASING & LEFT CLICK INCREASING)  *********************/
 
+            int i1,j1,i2,j2;
+            int button1=getMouse(j1,i1);
+            int button2=getMouse(j2,i2);
+            while(true){
+                cout<<i1<<" "<<j1<<endl;
+                cout<<i2<<" "<<j2<<endl;
+                if (button1==1)
+                    draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),image,width,height);
+
+                else
+                    draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),image,width,height);
+
+                click();
+                clearWindow();
+                putGreyImage(IntPoint2(0,0), image, width, height);
+
+                button1=getMouse(j1,i1);
+                button2=getMouse(j2,i2);
+
+            }
 //    int i1,j1,i2,j2;
-//    int button1=getMouse(j1,i1);
-//    int button2=getMouse(j2,i2);
+//    Event e;
+
 //    while(true){
-//        if (button1==1)
-//            draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),width,height);
+//        getEvent(0,e);
+//        if (e.type==EVT_BUT_ON){
+//            i1=e.pix[1],j1=e.pix[0];
+//            cout<<i1<<" "<<j1<<endl;
+//            while (e.type!=EVT_BUT_OFF){
+//                if (e.type==EVT_MOTION){
+//                    i2=e.pix[1],j2=e.pix[0];
+//                    cout<<i1<<" "<<j1<<endl;
+//                    cout<<i2<<" "<<j2<<endl;
+//                    if (e.button==1)
+//                        draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),image,width,height);
 
-//        else
-//            draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),width,height);
+//                    else
+//                        draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),image,width,height);
 
-//        click();
-//        clearWindow();
-//        putGreyImage(IntPoint2(0,0), image, width, height);
-
-//        button1=getMouse(j1,i1);
-//        button2=getMouse(j2,i2);
-
+//                }
+//                getEvent(0,e);
+//            }
+//            clearWindow();
+//            putGreyImage(IntPoint2(0,0), image, width, height);
+//        }
 //    }
-    int i1,j1,i2,j2;
-    Event e;
-
-    while(true){
-        getEvent(0,e);
-        if (e.type==EVT_BUT_ON)
-            i1=e.pix[1],j1=e.pix[0];
-        if (e.type==EVT_MOTION){
-            i2=e.pix[1],j2=e.pix[0];
-            noRefreshBegin();
-            clearWindow();
-            putGreyImage(IntPoint2(0,0), image, width, height);
-            if (e.button==1){
-                draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),width,height);}
-            else{
-                draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),width,height);}
-            noRefreshEnd();
-        }
-        if (e.type==EVT_BUT_OFF){
-            clearWindow();
-            putGreyImage(IntPoint2(0,0), image, width, height);}
-    }
 
     endGraphics();
 
