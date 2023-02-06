@@ -1,6 +1,6 @@
 #include "tree.h"
 
-const char* default_image_file=srcPath("/test-2.jpg");
+const char* default_image_file=srcPath("/image_noir_et_blanc.jpg");
 
 byte* imageReverse(const int N,byte* image){
     byte* imageReverse=new byte[N];
@@ -55,85 +55,45 @@ int main(){
 
     BuildComponentTree(V_incr,width,height,image_incr,att_incr,Nodes_incr,nodeRoot_incr,root_incr,M_incr,lowest_node_incr);
     inverseTree(nodeRoot_incr);
+
     /**********DISPLAY THE TREES *********************/
 
-    string prefix="-",  indent= " ";
-    cout<<" increasing"<<endl;
-    display( nodeRoot_incr,prefix,  indent);
-    cout<<" decreasing"<<endl;
-    display( nodeRoot_decr,prefix,  indent);
+    //display_tree_terminal(nodeRoot_incr, nodeRoot_decr);
+//       byte* imageReconstruct=Keep_N_Lobes(V_incr,width,height,M_incr,Nodes_incr,nodeRoot_incr,root_incr,AREA,10);
+//       clearWindow();
+//       putGreyImage(IntPoint2(0,0), imageReconstruct, width, height);
 
-    //    byte* imageReconstruct=Keep_N_Lobes(V,width,height,M,Nodes,nodeRoot,root,AREA,2);
-    //    clearWindow();
-    //    putGreyImage(IntPoint2(0,0), imageReconstruct, width, height);
-
-    //    click();
-    //    clearWindow();
-    //    putGreyImage(IntPoint2(0,0), image, width, height);
+//       click();
+//       clearWindow();
+//       putGreyImage(IntPoint2(0,0), image, width, height);
 
     /**********DISPLAY UNDER WITH PARENTS IN GREEN (RIGHT CLICK DECREASING & LEFT CLICK INCREASING)  *********************/
-    //    int i1,j1;
-    //    int button1=getMouse(j1,i1);
-    //    while(true){
-    //        if (button1==1)
-    //            draw_with_parent(&Nodes_decr[M_decr[i1*width+j1]],width,height);
 
-    //        else
-    //            draw_with_parent(&Nodes_incr[M_incr[i1*width+j1]],width,height);
-    //        click();
-    //        clearWindow();
-    //        putGreyImage(IntPoint2(0,0), image, width, height);
 
-    //        button1=getMouse(j1,i1);
-    //    }
+    //display_node_children(Nodes_incr, M_incr,Nodes_decr, M_decr, image, width, height);
+
+
     /**********DISPLAY BETWEEN TWO POINT (RIGHT CLICK DECREASING & LEFT CLICK INCREASING)  *********************/
 
-            int i1,j1,i2,j2;
-            int button1=getMouse(j1,i1);
-            int button2=getMouse(j2,i2);
-            while(true){
-                cout<<i1<<" "<<j1<<endl;
-                cout<<i2<<" "<<j2<<endl;
-                if (button1==1)
-                    draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),image,width,height);
 
-                else
-                    draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),image,width,height);
+    //display_two_clicks(Nodes_incr, M_incr,Nodes_decr, M_decr, image, width, height);
 
-                click();
-                clearWindow();
-                putGreyImage(IntPoint2(0,0), image, width, height);
+    //display_keep_clicking(Nodes_incr, M_incr,Nodes_decr, M_decr, image, width, height);
 
-                button1=getMouse(j1,i1);
-                button2=getMouse(j2,i2);
+    display_filtered_picture(nodeRoot_incr, 50, width, height);
+    cout<<"treshold = 50"<<endl;
+    click();
+    display_filtered_picture(nodeRoot_incr, 100, width, height);
+    cout<<"treshold =100"<<endl;
+    click();
+    display_filtered_picture(nodeRoot_incr, 1000, width, height);
+    cout<<"treshold = 1000"<<endl;
+    click();
+    display_filtered_picture(nodeRoot_incr, 10000, width, height);
+    cout<<"treshold = 10000"<<endl;
+    click();
 
-            }
-//    int i1,j1,i2,j2;
-//    Event e;
 
-//    while(true){
-//        getEvent(0,e);
-//        if (e.type==EVT_BUT_ON){
-//            i1=e.pix[1],j1=e.pix[0];
-//            cout<<i1<<" "<<j1<<endl;
-//            while (e.type!=EVT_BUT_OFF){
-//                if (e.type==EVT_MOTION){
-//                    i2=e.pix[1],j2=e.pix[0];
-//                    cout<<i1<<" "<<j1<<endl;
-//                    cout<<i2<<" "<<j2<<endl;
-//                    if (e.button==1)
-//                        draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),image,width,height);
-
-//                    else
-//                        draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),image,width,height);
-
-//                }
-//                getEvent(0,e);
-//            }
-//            clearWindow();
-//            putGreyImage(IntPoint2(0,0), image, width, height);
-//        }
-//    }
 
     endGraphics();
 

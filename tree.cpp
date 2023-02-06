@@ -1,5 +1,6 @@
 #include "tree.h"
 
+
 void MakeSet(const int x,Attributes* att,const bool type){
     att[x].setPar(x,type),att[x].setRank(0,type);
 }
@@ -161,7 +162,6 @@ void draw(Node* n,const byte* F,int width, int height){
     vector<int> vetcor_pixel={};
     Pixel_under_n(vetcor_pixel,n);
     noRefreshBegin();
-    clearWindow();
     putGreyImage(IntPoint2(0,0), F, width, height);
     for (int i=0;i<vetcor_pixel.size();i++){
         int p=vetcor_pixel[i];
@@ -176,6 +176,17 @@ void draw_with_parent(Node* n,const byte* F,int width, int height){
         drawPoint(p%width,p/width,GREEN);
     }
 }
+
+void display_tree_terminal(Node* nodeRoot_incr, Node* nodeRoot_decr){
+    string prefix="-",  indent= " ";
+    cout<<" increasing"<<endl;
+    display( nodeRoot_incr,prefix,  indent);
+    cout<<" decreasing"<<endl;
+    display( nodeRoot_decr,prefix,  indent);
+}
+
+
+
 
 void inverseTree(Node* nodeRoot){
     nodeRoot->setLevel(255-nodeRoot->getLevel());
@@ -206,11 +217,12 @@ int numberLeaf(Node* nodeRoot){
     return L;
 }
 int firstLeaf(vector<int>& ListPixelWhichStay,Node* Nodes){
-    while(Nodes[ListPixelWhichStay.front()].getNbChildren()!=0)
-        ListPixelWhichStay.erase(ListPixelWhichStay.begin());
-    int l=ListPixelWhichStay.front();
-    ListPixelWhichStay.erase(ListPixelWhichStay.begin());
-    return l;
+    int i=0;
+    while(Nodes[ListPixelWhichStay[i]].getNbChildren()!=0)
+        i++;
+    int leaf=ListPixelWhichStay[i];
+    ListPixelWhichStay.erase(ListPixelWhichStay.begin()+i);
+    return leaf;
 }
 int toPixelRef(Node* n, Node* Nodes,vector<int> ListPixelReference){
     for (int i=0;i<ListPixelReference.size();i++){
@@ -222,7 +234,7 @@ int toPixelRef(Node* n, Node* Nodes,vector<int> ListPixelReference){
 byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* Nodes,Node* nodeRoot,int root,const int caracteristic,  const int N){
     vector<int> ListPixelReference={};
     sortVectorPixelRef(width,height,caracteristic,M,Nodes,ListPixelReference);
-    vector<int> Q;
+    vector<int> Q={};
     int L=numberLeaf(nodeRoot);
     vector<int> ListPixelWhichStay(ListPixelReference.size());
     copy(ListPixelReference.begin(),ListPixelReference.end(),ListPixelWhichStay.begin());
@@ -235,7 +247,6 @@ byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* N
         Nodes[c].setMark(1);
         Q.push_back(c);
     }
-    Nodes[root].setMark(1);
     while (Q.size()!=0){
         int c=Q.front();
         Q.erase(Q.begin());
@@ -267,3 +278,107 @@ Node* get_parent_commun(Node* n1,Node* n2){
     else
         get_parent_commun(n1,n2->getParent());
 };
+
+
+void display_node_children(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr, byte* image, int width, int height){
+    int i1,j1;
+    int button1=getMouse(j1,i1);
+    while(true){
+        if (button1==1)
+            draw_with_parent(&Nodes_decr[M_decr[i1*width+j1]],image,width,height);
+        else
+            draw_with_parent(&Nodes_incr[M_incr[i1*width+j1]],image,width,height);
+        click();
+        clearWindow();
+        putGreyImage(IntPoint2(0,0), image, width, height);
+
+        button1=getMouse(j1,i1);
+    }
+}
+
+
+void display_two_clicks(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr, byte* image, int width, int height){
+    int i1,j1,i2,j2;
+    int button1=getMouse(j1,i1);
+    int button2=getMouse(j2,i2);
+    while(true){
+        if (button1==1)
+            draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),image,width,height);
+
+        else
+            draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),image,width,height);
+
+        click();
+        clearWindow();
+        putGreyImage(IntPoint2(0,0), image, width, height);
+
+        button1=getMouse(j1,i1);
+        button2=getMouse(j2,i2);
+
+    }
+}
+
+void display_keep_clicking(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr, byte* image, int width, int height){
+    int i1,j1,i2,j2;  //(i1,j1) : first click || (i2,j2) : position of the mouse
+    int ti, tf;
+    Event e;
+
+    while(true){
+        getEvent(1,e);
+        if (e.type==EVT_BUT_ON){ //first click
+            i1=e.pix[1],j1=e.pix[0];
+            int click_type = e.button;
+            while (e.type!=EVT_BUT_OFF){
+                ti = clock();
+                getEvent(-1,e);
+                if (e.type==EVT_MOTION){ //mouse is changing of pixel
+                    i2=e.pix[1],j2=e.pix[0];
+                    if (click_type==1)
+                        draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),image,width,height);
+                    else if (click_type==3)
+                        draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),image,width,height);
+                    tf = clock();
+                    cout << (tf-ti)/CLOCKS_PER_SEC <<endl;
+                }
+            }
+            cout<<"off"<<endl;
+            clearWindow();
+            putGreyImage(IntPoint2(0,0), image, width, height);
+        }
+    }
+}
+void filter_picture(Node* n, byte* picture, int treshold, int level){
+    //If we are in the nodes who are being blurred -> set all pixels at grey_level "level"
+    if(level!=-1){
+        for(int i=0; i<n->getPixel().size(); i++)
+            picture[n->getPixel()[i]] = level;
+        for(int i=0; i<n->getNbChildren(); i++)
+            filter_picture(n->getChildren()[i], picture, treshold, level);
+    }
+
+    else{
+        //Else, we set the pixels at the level of the node
+        for(int i=0; i<n->getPixel().size(); i++)
+            picture[n->getPixel()[i]] = n->getLevel();
+        //If area>treshold : we keep going
+        if(n->getArea()>treshold){
+            for(int i=0; i<n->getNbChildren(); i++)
+                filter_picture(n->getChildren()[i], picture, treshold, level);
+        }
+        //Else we modify the levels of the children to be the node's one (=blurring)
+        else{
+            for(int i=0; i<n->getNbChildren(); i++)
+                filter_picture(n->getChildren()[i], picture, treshold, n->getLevel());
+        }
+    }
+}
+
+
+void display_filtered_picture(Node* root, int treshold, int width, int height){
+    byte* new_picture = new byte[width*height];
+    filter_picture(root, new_picture, treshold, -1);
+    clearWindow();
+    putGreyImage(IntPoint2(0,0), new_picture, width, height);
+}
+
+

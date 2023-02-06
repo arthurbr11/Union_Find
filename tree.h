@@ -5,6 +5,7 @@
 #include <vector>
 #include <Imagine/Graphics.h>
 #include <cmath>
+#include <ctime>
 
 
 using namespace Imagine;
@@ -92,6 +93,7 @@ void display(Node* nodeRoot,string prefix, string indent);
 void Pixel_under_n(vector<int> &vector_pixel,Node* n);
 void draw(Node* n,const byte* F,int width, int height);
 void draw_with_parent(Node* n,const byte* F,int width, int height);
+void display_tree_terminal(Node* nodeRoot_incr, Node* nodeRoot_decr);
 
 
 
@@ -104,6 +106,13 @@ int toPixelRef(Node n, Node* Nodes,vector<int> ListPixelReference);
 byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* Nodes,Node* nodeRoot,int root,const int caracteristic, const int N);
 int RemoveLobe(int c,Node* Nodes,vector<int>ListPixelReference);
 
+
+void display_node_children(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr, byte* image, int width, int height);
+void display_two_clicks(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr, byte* image, int width, int height);
+void display_keep_clicking(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr, byte* image, int width, int height);
+
+void filter_picture(Node* n, byte* picture, int treshold, int level);
+void display_filtered_picture(Node* root, int treshold, int width, int height);
 
 
 Node* get_parent_commun(Node* n1,Node* n2);
