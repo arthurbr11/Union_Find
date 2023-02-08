@@ -39,12 +39,13 @@ class Node{
     int vol;
     int mark;
     int nb_children;
+    bool is_consider;
     Node* parent;
     vector<Node*> children;
     vector<int> list_pixel;
 public:
-    Node(){level=-1; children={}; area=-1, highest=-1;vol=-1;mark=0;nb_children=0;list_pixel={};}
-    Node(int l){level=l; children={}; area=1, highest=l;vol=1;mark=0;nb_children=0;list_pixel={};}
+    Node(){level=-1; children={}; area=-1, highest=-1;vol=-1;mark=0;nb_children=0;list_pixel={};is_consider=true;}
+    Node(int l){level=l; children={}; area=1, highest=l;vol=1;mark=0;nb_children=0;list_pixel={};is_consider=true;}
     bool operator ==(Node n){if (level==n.level && area==n.area && highest==n.highest && vol==n.vol && mark==n.mark && nb_children==n.nb_children && list_pixel==n.list_pixel)return true;return false;}
 
     void setParent(Node* new_parent){parent=new_parent;}
@@ -67,6 +68,8 @@ public:
     void setNbChildren(int nb){nb_children=nb;}
     void addPixel(int p){list_pixel.push_back(p);}
     vector<int> getPixel(){return list_pixel;}
+    bool getConsideration(){return is_consider;}
+    void setConsideration(bool consideration){is_consider=consideration;}
 };
 
 void MakeSet(const int x,Attributes* att,const bool type);// we define true for node and false for tree
@@ -111,8 +114,10 @@ void display_node_children(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int*
 void display_two_clicks(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr, byte* image, int width, int height);
 void display_keep_clicking(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr, byte* image, int width, int height);
 
-void filter_picture(Node* n, byte* picture, int treshold, int level);
-void display_filtered_picture(Node* root, int treshold, int width, int height);
+void filter_tree(Node* n, int treshold, int level);
+void filter_picture(Node* nodeRoot,byte* new_image,byte* image);
+int level_consider(Node* node);
+void display_filtered_picture(Node* nodeRoot,byte* image, int treshold, int width, int height);
 
 
 Node* get_parent_commun(Node* n1,Node* n2);

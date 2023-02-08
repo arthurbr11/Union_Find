@@ -1,6 +1,6 @@
 #include "tree.h"
 
-const char* default_image_file=srcPath("/image_noir_et_blanc.jpg");
+const char* default_image_file=srcPath("/tableau-2.jpg");
 
 byte* imageReverse(const int N,byte* image){
     byte* imageReverse=new byte[N];
@@ -76,19 +76,21 @@ int main(){
 
 
     //display_two_clicks(Nodes_incr, M_incr,Nodes_decr, M_decr, image, width, height);
+    filter_tree(Nodes_decr,500,-1);
+    filter_tree(Nodes_incr,500,-1);
 
-    //display_keep_clicking(Nodes_incr, M_incr,Nodes_decr, M_decr, image, width, height);
+    display_keep_clicking(Nodes_incr, M_incr,Nodes_decr, M_decr, image, width, height);
 
-    display_filtered_picture(nodeRoot_incr, 50, width, height);
+    display_filtered_picture(nodeRoot_incr, image,50, width, height);
     cout<<"treshold = 50"<<endl;
     click();
-    display_filtered_picture(nodeRoot_incr, 100, width, height);
+    display_filtered_picture(nodeRoot_incr, image,100, width, height);
     cout<<"treshold =100"<<endl;
     click();
-    display_filtered_picture(nodeRoot_incr, 1000, width, height);
+    display_filtered_picture(nodeRoot_incr, image,1000, width, height);
     cout<<"treshold = 1000"<<endl;
     click();
-    display_filtered_picture(nodeRoot_incr, 10000, width, height);
+    display_filtered_picture(nodeRoot_incr, image,10000, width, height);
     cout<<"treshold = 10000"<<endl;
     click();
 
