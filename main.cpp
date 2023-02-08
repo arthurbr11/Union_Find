@@ -13,7 +13,6 @@ byte* imageReverse(const int N,byte* image){
 
 int main(){
 
-    true? cout<<"s",cout<<"e":cout<<"f",cout<<"j";
     string image_file = (argc>1)? argv[1]: default_image_file;
     byte* image;
     int width, height;
@@ -25,8 +24,8 @@ int main(){
 
     Window window = openWindow(width, height);
     putGreyImage(IntPoint2(0,0), image, width, height);
-
     int N=width*height;
+
     /**********COMPONENT TREE(DECREASING) FOR THE IMAGE *********************/
     int* V_decr=new int [N];
     Attributes* att_decr=new Attributes[N];

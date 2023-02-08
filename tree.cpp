@@ -329,16 +329,16 @@ void display_keep_clicking(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int*
             i1=e.pix[1],j1=e.pix[0];
             int click_type = e.button;
             while (e.type!=EVT_BUT_OFF){
-                ti = clock();
                 getEvent(-1,e);
                 if (e.type==EVT_MOTION){ //mouse is changing of pixel
+                    ti = clock();
                     i2=e.pix[1],j2=e.pix[0];
                     if (click_type==1)
                         draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),image,width,height);
                     else if (click_type==3)
                         draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),image,width,height);
                     tf = clock();
-                    cout << (tf-ti)/CLOCKS_PER_SEC <<endl;
+                    cout << (tf-ti)/(float)CLOCKS_PER_SEC <<endl;
                 }
             }
             cout<<"off"<<endl;
