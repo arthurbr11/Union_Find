@@ -4,14 +4,10 @@
 void MakeSet(const int x,Attributes* att,const bool type){
     att[x].setPar(x,type),att[x].setRank(0,type);
 }
-
 int Find(const int x,Attributes* att,const bool type){
     if(att[x].getPar(type)!=x)
         att[x].setPar(Find(att[x].getPar(type),att,type),type);
-    return att[x].getPar(type);
-
-}
-
+    return att[x].getPar(type);}
 int Link(int x, int y, Attributes* att,const bool type){
     if(att[x].getRank(type)>att[y].getRank(type)){
         int z = x;
@@ -24,7 +20,6 @@ int Link(int x, int y, Attributes* att,const bool type){
     return y;
 
 }
-
 int MergeNode(int n1, int n2, Attributes* att, Node* Nodes){
     int tmpNode= Link(n1, n2,att,node);
     int tmpNode2=-1;
@@ -48,14 +43,13 @@ void sort(int* V, const byte* F, const int N){ // decreasing sort
     }
     int current_pos=0;
     for(int i=0;i<256;i++){
-        for(int j=0;j<Levels[255-i].size();j++){
+        int n=Levels[255-i].size();
+        for(int j=0;j<n;j++){
             V[current_pos]=Levels[255-i][j];
             current_pos++;
         }
     }
 }
-
-
 vector<int> valid_neighbors(const vector<bool> &Processed,const int p, const byte* F, const int width,const int height){
     vector<int> E={};
     if(p%width!=0 and Processed[p-1] and F[p-1]>=F[p])
@@ -68,10 +62,11 @@ vector<int> valid_neighbors(const vector<bool> &Processed,const int p, const byt
         E.push_back(p+width);
     return E;
 }
-
-
-
-
+void make_parent(Node* nodeRoot,Node* parent){
+    nodeRoot->setParent(parent);
+    for (int i=0;i<nodeRoot->getNbChildren();i++)
+        make_parent(nodeRoot->getChildren()[i],nodeRoot);
+};
 
 void BuildComponentTree(int* V,const int width,const int height,const byte* F,Attributes* att, Node* Nodes,Node* nodeRoot,  int &root, int* M, int* lowest_node){
     const int N=width*height;
@@ -88,7 +83,8 @@ void BuildComponentTree(int* V,const int width,const int height,const byte* F,At
         int curTree=Find(V[i], att,tree);
         int curNode=Find(lowest_node[curTree], att,node);
         vector<int> valid_neighborhood = valid_neighbors(Processed, V[i], F, width, height);
-        for(int j=0;j<valid_neighborhood.size();j++){
+        int n=valid_neighborhood.size();
+        for(int j=0;j<n;j++){
             int adjTree=Find(valid_neighborhood[j], att,tree);
             int adjNode=Find(lowest_node[adjTree], att,node);
             if(curNode!=adjNode){
@@ -120,7 +116,8 @@ void BuildComponentTree(int* V,const int width,const int height,const byte* F,At
 int computeVolume(Node* n){
     int vol = n->getArea();
     if(n->getNbChildren()>0){
-        for(int i=0;i<n->getNbChildren();i++)
+        int nbChildren=n->getNbChildren();
+        for(int i=0;i<nbChildren;i++)
             vol += computeVolume(n->getChildren()[i])+n->getChildren()[i]->getArea()*(n->getChildren()[i]->getLevel()-n->getLevel());
     }
     n->setVol(vol);
@@ -128,57 +125,50 @@ int computeVolume(Node* n){
 
 }
 
-void drawTree(byte* image,Node* nodeRoot){
-    for (int i=0;i<nodeRoot->getNbChildren();i++)
-        drawTree(image,nodeRoot->getChildren()[i]);
-    for (int i=0;i<nodeRoot->getPixel().size();i++)
-        image[nodeRoot->getPixel()[i]]=nodeRoot->getLevel();
-}
-void make_parent(Node* nodeRoot,Node* parent){
-    nodeRoot->setParent(parent);
-    for (int i=0;i<nodeRoot->getNbChildren();i++)
-        make_parent(nodeRoot->getChildren()[i],nodeRoot);
-};
-
-
-void display(Node* nodeRoot,string prefix, string indent){
-    cout << prefix<<nodeRoot->getLevel()<< endl;
-    for (int i=0;i<nodeRoot->getNbChildren();i++){
-        display(nodeRoot->getChildren()[i],prefix+indent,indent);
-    }
-};
-
-
 void Pixel_under_n(vector<int> &vector_pixel,Node* n){
-    Node* new_n=n;
-    while (!new_n->getConsideration()){
-        for (int i=0;i<new_n->getPixel().size();i++){
-            vector_pixel.push_back(new_n->getPixel()[i]);
-        }
-        new_n=new_n->getParent();
-    }
-    for (int i=0;i<n->getPixel().size();i++){
+    int nbPixel=n->getPixel().size();
+    for (int i=0;i<nbPixel;i++){
         vector_pixel.push_back(n->getPixel()[i]);
     }
     if (n->getNbChildren()==0)
         return ;
-    for (int i=0;i<n->getNbChildren();i++){
+    int nbChildren=n->getNbChildren();
+    for (int i=0;i<nbChildren;i++){
         Pixel_under_n(vector_pixel,n->getChildren()[i]);
     }
     return ;
 }
-void draw(Node* n,const byte* F,int width, int height){
+
+void drawTree(byte* image,Node* nodeRoot){
+    int nbChildren=nodeRoot->getNbChildren();
+    for (int i=0;i<nbChildren;i++)
+        drawTree(image,nodeRoot->getChildren()[i]);
+    int nbPixel=nodeRoot->getPixel().size();
+    for (int i=0;i<nbPixel;i++)
+        image[nodeRoot->getPixel()[i]]=nodeRoot->getLevel();
+}
+void display(Node* nodeRoot,string prefix, string indent){
+    cout << prefix<<nodeRoot->getLevel()<< endl;
+    int nbChildren=nodeRoot->getNbChildren();
+    for (int i=0;i<nbChildren;i++){
+        display(nodeRoot->getChildren()[i],prefix+indent,indent);
+    }
+};
+void draw(Node* n,const byte* F,const int width,const int height){
     vector<int> vetcor_pixel={};
     Pixel_under_n(vetcor_pixel,n);
-    byte * r=new byte[width*height];
-    byte * g=new byte[width*height];
-    byte * b=new byte[width*height];
-    for (int i=0;i<width*height;i++){
+    const int N=width*height;
+    byte * r=new byte[N];
+    byte * g=new byte[N];
+    byte * b=new byte[N];
+
+    for (int i=0;i<N;i++){
         r[i]=F[i];
         g[i]=F[i];
         b[i]=F[i];
     }
-    for (int i=0;i<vetcor_pixel.size();i++){
+    int nbPixel=vetcor_pixel.size();
+    for (int i=0;i<nbPixel;i++){
         int p=vetcor_pixel[i];
         g[p]=0;
         b[p]=0;
@@ -188,14 +178,14 @@ void draw(Node* n,const byte* F,int width, int height){
     putColorImage(IntPoint2(0,0), r,g,b, width, height);
     noRefreshEnd();
 }
-void draw_with_parent(Node* n,const byte* F,int width, int height){
+void draw_with_parent(Node* n,const byte* F,const int width,const int height){
     draw(n,F,width,height);
-    for (int i=0;i<n->getPixel().size();i++){
+    int nbPixel=n->getPixel().size();
+    for (int i=0;i<nbPixel;i++){
         int p=n->getPixel()[i];
         drawPoint(p%width,p/width,GREEN);
     }
 }
-
 void display_tree_terminal(Node* nodeRoot_incr, Node* nodeRoot_decr){
     string prefix="-",  indent= " ";
     cout<<" increasing"<<endl;
@@ -204,16 +194,22 @@ void display_tree_terminal(Node* nodeRoot_incr, Node* nodeRoot_decr){
     display( nodeRoot_decr,prefix,  indent);
 }
 
-
-
-
+byte* imageReverse(const int N,byte* image){
+    byte* imageReverse=new byte[N];
+    for(int i=0;i<N;i++){
+        imageReverse[i]=255-image[i];
+    }
+    return imageReverse;
+}
 void inverseTree(Node* nodeRoot){
     nodeRoot->setLevel(255-nodeRoot->getLevel());
-    for(int i=0;i<nodeRoot->getNbChildren();i++)
+    int nbChildren=nodeRoot->getNbChildren();
+    for(int i=0;i<nbChildren;i++)
         inverseTree(nodeRoot->getChildren()[i]);
 }
 void sortVectorPixelRef(const int width,const int height ,const int caracteristic,const int* M,Node* Nodes,vector<int>& ListPixelReference){
-    for (int i=0;i<width*height;i++){
+    const int N=width*height;
+    for (int i=0;i<N;i++){
         if (!count(ListPixelReference.begin(),ListPixelReference.end(),M[i]))
             ListPixelReference.push_back(M[i]);
     }
@@ -223,14 +219,13 @@ void sortVectorPixelRef(const int width,const int height ,const int caracteristi
         sort(ListPixelReference.begin(),ListPixelReference.end(),[&Nodes](const auto& a,const auto& b){ return Nodes[a].getHighest()< Nodes[b].getHighest(); });
     else
         sort(ListPixelReference.begin(),ListPixelReference.end(),[&Nodes](const auto& a,const auto& b){ return Nodes[a].getVol()< Nodes[b].getVol(); });
-
 }
-
 int numberLeaf(Node* nodeRoot){
     if (nodeRoot->getNbChildren()==0){
         return 1;}
     int L=0;
-    for (int i=0;i<nodeRoot->getNbChildren();i++){
+    int nbChildren=nodeRoot->getNbChildren();
+    for (int i=0;i<nbChildren;i++){
         L+=numberLeaf(nodeRoot->getChildren()[i]);
     }
     return L;
@@ -243,13 +238,137 @@ int firstLeaf(vector<int>& ListPixelWhichStay,Node* Nodes){
     ListPixelWhichStay.erase(ListPixelWhichStay.begin()+i);
     return leaf;
 }
-int toPixelRef(Node* n, Node* Nodes,vector<int> ListPixelReference){
-    for (int i=0;i<ListPixelReference.size();i++){
+int toPixelRef(Node* n, Node* Nodes,const vector<int> ListPixelReference){
+    int nbPix=ListPixelReference.size();
+    for (int i=0;i<nbPix;i++){
         if (Nodes[ListPixelReference[i]]==*n)
             return ListPixelReference[i];
     }
-    return -1;
+    return -1;}
+Node* get_parent_commun(Node* n1,Node* n2){
+    if (n1==n2 and n1->getConsideration() and n2->getConsideration())
+        return n1;
+    if (n1->getArea()==n2->getArea())
+        get_parent_commun(n1->getParent(),n2);
+    if (n1->getArea()<n2->getArea())
+        get_parent_commun(n1->getParent(),n2);
+    else
+        get_parent_commun(n1,n2->getParent());
+};
+
+void display_node_children(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr,const byte* image,const int width,const int height){
+    int i1,j1;
+    int button1=getMouse(j1,i1);
+    while(true){
+        if (button1==1)
+            draw_with_parent(&Nodes_decr[M_decr[i1*width+j1]],image,width,height);
+        else
+            draw_with_parent(&Nodes_incr[M_incr[i1*width+j1]],image,width,height);
+        click();
+        clearWindow();
+        putGreyImage(IntPoint2(0,0), image, width, height);
+
+        button1=getMouse(j1,i1);
+    }
 }
+void display_two_clicks(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr,const byte* image,const int width,const int height){
+    int i1,j1,i2,j2;
+    int button1=getMouse(j1,i1);
+    int button2=getMouse(j2,i2);
+    while(true){
+        if (button1==1)
+            draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),image,width,height);
+
+        else
+            draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),image,width,height);
+
+        click();
+        clearWindow();
+        putGreyImage(IntPoint2(0,0), image, width, height);
+
+        button1=getMouse(j1,i1);
+        button2=getMouse(j2,i2);
+
+    }}
+void display_keep_clicking(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr,const byte* image,const int width,const int height){
+    int i1,j1,i2,j2;  //(i1,j1) : first click || (i2,j2) : position of the mouse
+    Event e;
+
+    while(true){
+        getEvent(1,e);
+        if (e.type==EVT_BUT_ON){ //first click
+            i1=e.pix[1],j1=e.pix[0];
+            int click_type = e.button;
+            while (e.type!=EVT_BUT_OFF){
+                getEvent(-1,e);
+                if (e.type==EVT_MOTION){ //mouse is changing of pixel
+                    i2=e.pix[1],j2=e.pix[0];
+                    if (click_type==1)
+                        draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),image,width,height);
+                    else if (click_type==3)
+                        draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),image,width,height);
+                }
+            }
+            clearWindow();
+            putGreyImage(IntPoint2(0,0), image, width, height);
+        }
+    }
+}
+
+void filter_tree(Node* n,const int treshold,const int level){
+    //If we are in the nodes who are being blurred -> change the role of the node in the tree to false
+    int nbChildren=n->getNbChildren();
+    if(level!=-1){
+        n->setConsideration(false);
+        for(int i=0; i<nbChildren; i++)
+            filter_tree(n->getChildren()[i], treshold, level);
+    }
+    else{
+        //Else, we don't change the role of the node in the tree
+        //If area>treshold : we keep going
+        if(n->getArea()>treshold){
+            for(int i=0; i<nbChildren; i++)
+                filter_tree(n->getChildren()[i],treshold, level);
+        }
+        //Else we modify the levels of the children to be the node's one (=blurring)
+        else{
+            for(int i=0; i<nbChildren; i++)
+                filter_tree(n->getChildren()[i], treshold, n->getLevel());
+        }
+    }
+}
+int level_consider(Node* node){
+    if (node->getConsideration())
+        return node->getLevel();
+    return level_consider(node->getParent());
+}
+void filter_picture(Node* nodeRoot,byte* new_image,const byte* image){
+    int nbPixel=nodeRoot->getPixel().size();
+    if (nodeRoot->getConsideration()){
+        for (int i=0;i<nbPixel;i++)
+            new_image[nodeRoot->getPixel()[i]]=image[nodeRoot->getPixel()[i]];
+    }
+    else{
+        int level=level_consider(nodeRoot);
+        for (int i=0;i<nbPixel;i++)
+            new_image[nodeRoot->getPixel()[i]]=level;
+    }
+    int nbChildren=nodeRoot->getNbChildren();
+    for (int i=0;i<nbChildren;i++){
+        filter_picture(nodeRoot->getChildren()[i],new_image,image);
+    }
+
+}
+void display_filtered_picture(Node* nodeRoot,const byte* image,const int treshold,const int width,const int height){
+    byte* new_image = new byte[width*height];
+    filter_tree(nodeRoot, treshold, -1);
+    filter_picture(nodeRoot,new_image,image);
+    clearWindow();
+    putGreyImage(IntPoint2(0,0), new_image, width, height);
+}
+
+//After this part the code doesn't work.We didn't manage to finish
+
 
 byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* Nodes,Node* nodeRoot,int root,const int caracteristic,  const int N){
     vector<int> ListPixelReference={};
@@ -285,130 +404,6 @@ int RemoveLobe(int c,Node* Nodes,vector<int>ListPixelReference){
     if (Nodes[c].getMark()==1)
         Nodes[c]=Nodes[RemoveLobe(toPixelRef(Nodes[c].getParent(),Nodes,ListPixelReference),Nodes,ListPixelReference)];
     return c;
-}
-
-
-Node* get_parent_commun(Node* n1,Node* n2){
-    if (n1==n2 and n1->getConsideration() and n2->getConsideration())
-        return n1;
-    if (n1->getArea()==n2->getArea())
-        get_parent_commun(n1->getParent(),n2);
-    if (n1->getArea()<n2->getArea())
-        get_parent_commun(n1->getParent(),n2);
-    else
-        get_parent_commun(n1,n2->getParent());
-};
-
-
-void display_node_children(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr, byte* image, int width, int height){
-    int i1,j1;
-    int button1=getMouse(j1,i1);
-    while(true){
-        if (button1==1)
-            draw_with_parent(&Nodes_decr[M_decr[i1*width+j1]],image,width,height);
-        else
-            draw_with_parent(&Nodes_incr[M_incr[i1*width+j1]],image,width,height);
-        click();
-        clearWindow();
-        putGreyImage(IntPoint2(0,0), image, width, height);
-
-        button1=getMouse(j1,i1);
-    }
-}
-
-
-void display_two_clicks(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr, byte* image, int width, int height){
-    int i1,j1,i2,j2;
-    int button1=getMouse(j1,i1);
-    int button2=getMouse(j2,i2);
-    while(true){
-        if (button1==1)
-            draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),image,width,height);
-
-        else
-            draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),image,width,height);
-
-        click();
-        clearWindow();
-        putGreyImage(IntPoint2(0,0), image, width, height);
-
-        button1=getMouse(j1,i1);
-        button2=getMouse(j2,i2);
-
-    }
-}
-
-void display_keep_clicking(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr, byte* image, int width, int height){
-    int i1,j1,i2,j2;  //(i1,j1) : first click || (i2,j2) : position of the mouse
-    Event e;
-
-    while(true){
-        getEvent(1,e);
-        if (e.type==EVT_BUT_ON){ //first click
-            i1=e.pix[1],j1=e.pix[0];
-            int click_type = e.button;
-            while (e.type!=EVT_BUT_OFF){
-                getEvent(-1,e);
-                if (e.type==EVT_MOTION){ //mouse is changing of pixel
-                    i2=e.pix[1],j2=e.pix[0];
-                    if (click_type==1)
-                        draw(get_parent_commun(&Nodes_decr[M_decr[i1*width+j1]],&Nodes_decr[M_decr[i2*width+j2]]),image,width,height);
-                    else if (click_type==3)
-                        draw(get_parent_commun(&Nodes_incr[M_incr[i1*width+j1]],&Nodes_incr[M_incr[i2*width+j2]]),image,width,height);
-                }
-            }
-            clearWindow();
-            putGreyImage(IntPoint2(0,0), image, width, height);
-        }
-    }
-}
-void filter_tree(Node* n, int treshold, int level){
-    //If we are in the nodes who are being blurred -> change the role of the node in the tree to false
-    if(level!=-1){
-        n->setConsideration(false);
-        for(int i=0; i<n->getNbChildren(); i++)
-            filter_tree(n->getChildren()[i], treshold, level);
-    }
-    else{
-        //Else, we don't change the role of the node in the tree
-        //If area>treshold : we keep going
-        if(n->getArea()>treshold){
-            for(int i=0; i<n->getNbChildren(); i++)
-                filter_tree(n->getChildren()[i],treshold, level);
-        }
-        //Else we modify the levels of the children to be the node's one (=blurring)
-        else{
-            for(int i=0; i<n->getNbChildren(); i++)
-                filter_tree(n->getChildren()[i], treshold, n->getLevel());
-        }
-    }
-}
-int level_consider(Node* node){
-    if (node->getConsideration())
-        return node->getLevel();
-    level_consider(node->getParent());
-}
-void filter_picture(Node* nodeRoot,byte* new_image,byte* image){
-    if (nodeRoot->getConsideration()){
-        for (int i=0;i<nodeRoot->getPixel().size();i++)
-            new_image[nodeRoot->getPixel()[i]]=image[nodeRoot->getPixel()[i]];
-    }
-    else{
-        int level=level_consider(nodeRoot);
-        for (int i=0;i<nodeRoot->getPixel().size();i++)
-            new_image[nodeRoot->getPixel()[i]]=level;
-    }
-    for (int i=0;i<nodeRoot->getNbChildren();i++){
-        filter_picture(nodeRoot->getChildren()[i],new_image,image);
-    }
-
-}
-void display_filtered_picture(Node* nodeRoot,byte* image, int treshold, int width, int height){
-    byte* new_image = new byte[width*height];
-    filter_tree(nodeRoot, treshold, -1);
-    filter_picture(nodeRoot,new_image,image);
-    clearWindow();
-    putGreyImage(IntPoint2(0,0), new_image, width, height);
 }
 
 

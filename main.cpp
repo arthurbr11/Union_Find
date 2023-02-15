@@ -2,13 +2,6 @@
 
 const char* default_image_file=srcPath("/tableau-2.jpg");
 
-byte* imageReverse(const int N,byte* image){
-    byte* imageReverse=new byte[N];
-    for(int i=0;i<N;i++){
-        imageReverse[i]=255-image[i];
-    }
-    return imageReverse;
-}
 
 
 int main(){
@@ -25,7 +18,7 @@ int main(){
     Window window = openWindow(width, height);
     putGreyImage(IntPoint2(0,0), image, width, height);
     int N=width*height;
-
+    float t_start=clock();
     /**********COMPONENT TREE(DECREASING) FOR THE IMAGE *********************/
     int* V_decr=new int [N];
     Attributes* att_decr=new Attributes[N];
@@ -54,50 +47,43 @@ int main(){
 
     BuildComponentTree(V_incr,width,height,image_incr,att_incr,Nodes_incr,nodeRoot_incr,root_incr,M_incr,lowest_node_incr);
     inverseTree(nodeRoot_incr);
+    float t_end=clock();
+    cout << "There is "<<N<<" pixels in the pictures."<<endl;
+    cout << "We compute the 2 trees in "<<(t_end-t_start)/(float) CLOCKS_PER_SEC<<" sec"<<endl;
 
-    /**********DISPLAY THE TREES *********************/
+    /**********DISPLAY THE TREE IN THE TERMINAL (USEFULL ONLY FOR SMALL TREE)*********************/
 
     //display_tree_terminal(nodeRoot_incr, nodeRoot_decr);
-//       byte* imageReconstruct=Keep_N_Lobes(V_incr,width,height,M_incr,Nodes_incr,nodeRoot_incr,root_incr,AREA,10);
-//       clearWindow();
-//       putGreyImage(IntPoint2(0,0), imageReconstruct, width, height);
+    /**********DISPLAY THE FILTERED IMAGE WITH DIFFERENT TRESHOLD  *********************/
 
-//       click();
-//       clearWindow();
-//       putGreyImage(IntPoint2(0,0), image, width, height);
+//    display_filtered_picture(nodeRoot_incr, image,50, width, height);
+//    cout<<"treshold = 50"<<endl;
+//    click();
+//    display_filtered_picture(nodeRoot_incr, image,100, width, height);
+//    cout<<"treshold =100"<<endl;
+//    click();
+//    display_filtered_picture(nodeRoot_incr, image,1000, width, height);
+//    cout<<"treshold = 1000"<<endl;
+//    click();
+//    display_filtered_picture(nodeRoot_incr, image,10000, width, height);
+//    cout<<"treshold = 10000"<<endl;
+//    click();
+//    clearWindow();
+//    putGreyImage(IntPoint2(0,0), image, width, height);
 
     /**********DISPLAY UNDER WITH PARENTS IN GREEN (RIGHT CLICK DECREASING & LEFT CLICK INCREASING)  *********************/
 
-
     //display_node_children(Nodes_incr, M_incr,Nodes_decr, M_decr, image, width, height);
-
 
     /**********DISPLAY BETWEEN TWO POINT (RIGHT CLICK DECREASING & LEFT CLICK INCREASING)  *********************/
 
-
     //display_two_clicks(Nodes_incr, M_incr,Nodes_decr, M_decr, image, width, height);
-    filter_tree(Nodes_decr,500,-1);
-    filter_tree(Nodes_incr,500,-1);
 
     display_keep_clicking(Nodes_incr, M_incr,Nodes_decr, M_decr, image, width, height);
 
-    display_filtered_picture(nodeRoot_incr, image,50, width, height);
-    cout<<"treshold = 50"<<endl;
-    click();
-    display_filtered_picture(nodeRoot_incr, image,100, width, height);
-    cout<<"treshold =100"<<endl;
-    click();
-    display_filtered_picture(nodeRoot_incr, image,1000, width, height);
-    cout<<"treshold = 1000"<<endl;
-    click();
-    display_filtered_picture(nodeRoot_incr, image,10000, width, height);
-    cout<<"treshold = 10000"<<endl;
-    click();
-
-
-
     endGraphics();
-
+    delete [] image;
+    delete [] image_incr;
     delete [] V_incr;
     delete [] att_incr;
     delete [] M_incr;
@@ -108,8 +94,6 @@ int main(){
     delete [] M_decr;
     delete [] lowest_node_decr;
     delete [] Nodes_decr;
-    delete default_image_file;
-
 
     return 0;
 }
