@@ -34,21 +34,31 @@ public:
 
 class Node{
     int level;
-    int area;
-    int highest;
-    int vol;
-    int mark;
     int nb_children;
-    bool is_consider;
     Node* parent;
     vector<Node*> children;
     vector<int> list_pixel;
+
+    //Used to filter the picture
+    bool is_consider;
+
+    //metric on the node
+    int area;
+    int highest;
+    int vol;
+
+    //Used in Keep_N_Lobes
+    int mark;
+
+
 public:
     Node(){level=-1; children={}; area=-1, highest=-1;vol=-1;mark=0;nb_children=0;list_pixel={};is_consider=true;}
     Node(int l){level=l; children={}; area=1, highest=l;vol=1;mark=0;nb_children=0;list_pixel={};is_consider=true;}
     ~Node(){int n=children.size();for (int i =0; i<n; ++i)delete children[i];}
+
     bool operator ==(Node n){if (level==n.level && area==n.area && highest==n.highest && vol==n.vol && mark==n.mark && nb_children==n.nb_children && list_pixel==n.list_pixel)return true;return false;}
 
+    //Basic getter and setter
     void setLevel(int l){level=l;}
     int getLevel(){return level;}
     void setArea(int a){area=a;}
@@ -72,6 +82,9 @@ public:
     vector<int> getPixel(){return list_pixel;}
 };
 
+//*************************************All these functions have been commented in the tree.cpp file****************************************************
+
+//All methods to build the component tree
 void MakeSet(const int x,Attributes* att,const bool type);
 int Find(const int x,Attributes* att,const bool type);
 int Link(int x, int y, Attributes* att,const bool type);
@@ -83,29 +96,34 @@ void make_parent(Node* nodeRoot,Node* parent);
 
 void BuildComponentTree(int* V,const int width,const int height,const byte* F, Attributes* att, Node* Nodes,Node* nodeRoot, int &root, int* M, int* lowest_node);
 
-int computeVolume(Node* n);
 
-void Pixel_under_n(vector<int> &vector_pixel,Node* n);
 
+
+//Intermediate display functions
 void drawTree(byte* image,Node* nodeRoot);
 void display(Node* nodeRoot,string prefix, string indent);
 void draw(Node* n,const byte* F,const int width,const int height);
 void draw_with_parent(Node* n,const byte* F,const int width,const int height);
 void display_tree_terminal(Node* nodeRoot_incr, Node* nodeRoot_decr);
 
-
-byte* imageReverse(const int N,byte* image);
-void inverseTree(Node* nodeRoot);
-void sortVectorPixelRef(const int width,const int height ,const int caracteristic,const int* M,Node* Nodes,vector<int>& ListPixelReference);
-int numberLeaf(Node* Nodes);
-int firstLeaf(vector<int>& ListPixelWhichStay,Node* Nodes);
-int toPixelRef(Node n, Node* Nodes,const vector<int> ListPixelReference);
-Node* get_parent_commun(Node* n1,Node* n2);
-
+//Displaying final results
 void display_node_children(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr,const byte* image,const int width,const int height);
 void display_two_clicks(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr,const byte* image,const int width,const int height);
 void display_keep_clicking(Node* Nodes_incr, int* M_incr, Node* Nodes_decr, int* M_decr,const byte* image,const int width,const int height);
 
+
+byte* imageReverse(const int N,byte* image);
+void inverseTree(Node* nodeRoot);
+
+Node* get_parent_commun(Node* n1,Node* n2);
+
+void Pixel_under_n(vector<int> &vector_pixel,Node* n);
+
+int computeVolume(Node* n);
+
+
+
+//Filtering
 void filter_tree(Node* n,const int treshold,const int level);
 int level_consider(Node* node);
 void filter_picture(Node* nodeRoot,byte* new_image,const byte* image);
@@ -115,3 +133,7 @@ void display_filtered_picture(Node* nodeRoot,const byte* image,const int treshol
 
 byte* Keep_N_Lobes (int* V,const int width,const int height,const int* M,Node* Nodes,Node* nodeRoot,int root,const int caracteristic, const int N);
 int RemoveLobe(int c,Node* Nodes,vector<int>ListPixelReference);
+void sortVectorPixelRef(const int width,const int height ,const int caracteristic,const int* M,Node* Nodes,vector<int>& ListPixelReference);
+int numberLeaf(Node* Nodes);
+int firstLeaf(vector<int>& ListPixelWhichStay,Node* Nodes);
+int toPixelRef(Node n, Node* Nodes,const vector<int> ListPixelReference);

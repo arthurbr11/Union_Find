@@ -18,8 +18,11 @@ int main(){
     Window window = openWindow(width, height);
     putGreyImage(IntPoint2(0,0), image, width, height);
     int N=width*height;
-    float t_start=clock();
+
     /**********COMPONENT TREE(DECREASING) FOR THE IMAGE *********************/
+
+    //Building and initializing the variables that will store the component tree
+    //NB : we followed the notation of the given article
     int* V_decr=new int [N];
     Attributes* att_decr=new Attributes[N];
     int* M_decr=new int [N];
@@ -30,10 +33,19 @@ int main(){
     int root_decr=-1;
     Node* nodeRoot_decr =new Node ();
 
-
+    //Computing the component tree of the picture and measuring the computing time
+    float t_start=clock();
     BuildComponentTree(V_decr,width,height,image,att_decr,Nodes_decr,nodeRoot_decr,root_decr,M_decr,lowest_node_decr);
+    float t_end=clock();
+
+    cout << "There is "<<N<<" pixels in the pictures."<<endl;
+    cout << "We compute a tree in "<<(t_end-t_start)/(float) CLOCKS_PER_SEC<<" sec"<<endl;
+
+
 
     /**********COMPONENT TREE(INCREASING) FOR THE IMAGE *********************/
+
+    //Same manipulations to build the reversed component tree
     int* V_incr=new int [N];
     Attributes* att_incr=new Attributes[N];
     int* M_incr=new int [N];
@@ -47,13 +59,13 @@ int main(){
 
     BuildComponentTree(V_incr,width,height,image_incr,att_incr,Nodes_incr,nodeRoot_incr,root_incr,M_incr,lowest_node_incr);
     inverseTree(nodeRoot_incr);
-    float t_end=clock();
-    cout << "There is "<<N<<" pixels in the pictures."<<endl;
-    cout << "We compute the 2 trees in "<<(t_end-t_start)/(float) CLOCKS_PER_SEC<<" sec"<<endl;
+
 
     /**********DISPLAY THE TREE IN THE TERMINAL (USEFULL ONLY FOR SMALL TREE)*********************/
 
     //display_tree_terminal(nodeRoot_incr, nodeRoot_decr);
+
+
     /**********DISPLAY THE FILTERED IMAGE WITH DIFFERENT TRESHOLD  *********************/
 
 //    display_filtered_picture(nodeRoot_incr, image,50, width, height);
